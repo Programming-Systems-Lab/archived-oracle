@@ -31,7 +31,6 @@ import org.xml.sax.*;
  * Intializes database interface
  */
 
-
 public class SchemaInterface
 {
     String moduleInfo = null;
