@@ -27,7 +27,7 @@ public class OracleSienaInterface implements Runnable, Notifiable
     PrintWriter log = null;
     static String rootPath = null;
     static String propFile = null;
-    
+
     //static String oraclePath = null;
     // PrintWriter log = new PrintWriter(System.err);
 
@@ -107,7 +107,7 @@ public class OracleSienaInterface implements Runnable, Notifiable
      */
     public static void main(String[] args)
     {
-	if((args.length < 1) || (args.length > 2) ) 
+	if((args.length < 1) || (args.length > 2) )
 	    {
 		System.out.println("Usage: java psl.oracle.OracleSienaInterface <root path> [senp://<host>:<port>]");
 		System.exit(1);
@@ -202,7 +202,7 @@ public class OracleSienaInterface implements Runnable, Notifiable
     {
 	Hashtable publishEvent = new Hashtable();
 	SchemaFragment fragment = new SchemaFragment();
-	String moduleName = "";
+	Vector moduleName = new Vector();
 	Oracle oracle = new Oracle(propFile);
 	String msg = null;
 	boolean result = false;
@@ -210,8 +210,7 @@ public class OracleSienaInterface implements Runnable, Notifiable
 	int srcID = this.hashCode();
 	publishEvent.put("MPRequestID", new AttributeValue(MPRequestID));
 	publishEvent.put("MPHostname", new AttributeValue(MPHost));
-		
-	try
+    try
 	    {
 		fragment = oracle.getFragment(query, rootPath);
 	    }
@@ -255,7 +254,7 @@ public class OracleSienaInterface implements Runnable, Notifiable
 	    {
 		se.printStackTrace();
 	    }
-	if(moduleName.length() > 0)
+	if(!moduleName.isEmpty())
 	    {
 		SendOracleReply sor = new SendOracleReply();
 		sor.sendReply(MPRequestID, MPHost, MPRequestID, moduleName);

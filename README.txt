@@ -34,9 +34,7 @@ There are two modes of operations for Oracle:
 
    The query must be represented in XML format:         
 
-     <FleXML:schemaQuery version="1.0" name="NAMESPACE:ELEMENT">   		                   <xPath>      			
-                        PATH	
-                   </xPath>	              </FleXML:schemaQuery>	    
+     <schemaQuery version="1.0" name="NAMESPACE:ELEMENT"><xpath>PATH</xpath></schemaQuery>	    
 
    where NAMESPACE and PATH are optional but at least one of them 
    is required.

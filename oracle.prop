@@ -1,4 +1,4 @@
 dbLocation=psl/oracle
 moduleDir=psl/oracle/modules
-defaultModuleInfo=tagprocessor.jar,false
+defaultModuleInfo=false,tagprocessor.jar
 

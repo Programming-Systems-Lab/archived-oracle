@@ -122,7 +122,7 @@ public class Oracle implements IOracle
 		System.err.println("Error while intializing the database: "+ e);
 		System.exit(1);
 	    }
-   
+
 	String nsName = null;
 	if(namespace != null)
 	    {
@@ -164,9 +164,43 @@ public class Oracle implements IOracle
 	boolean classExists = false;
 	boolean isPersistent = false;
 	String instanceName = null;
+	Vector moduleVector = new Vector();
+	StringTokenizer tk = new StringTokenizer(moduleInfo, ", ", false);
 	if(moduleInfo.length() > 0)
 	    {
-		StringTokenizer tk = new StringTokenizer(moduleInfo, ", ", false);
+	    isPersistent = false;
+		try
+		    {
+		    // get if this is persistent or not
+			isPersistent = Boolean.valueOf(tk.nextToken()).booleanValue();
+		    }
+		catch (Exception e)
+		    {
+			throw new InvalidSchemaFormatException("This schema definition for tag "
+							       + name + " is incorrectly formatted."
+							       +"The line for this tag is: "
+							       + moduleInfo + ", and the error was "
+							       + e);
+		    }
+		instanceName = " ";
+		if (isPersistent == true)
+		    {
+			try
+			    {
+				instanceName = tk.nextToken();
+			    }
+			catch (Exception e)
+			    {
+				throw new InvalidSchemaFormatException("The schema definition for "
+								       + "the tag " + name
+								       + "is incorrectly formatted. "
+								       + "The line for this tag is: "
+								       + moduleInfo + ", and the error"
+								       +" was "+ e);
+			    }
+
+		    }
+
 		try
 		    {
 			// get the className
@@ -192,48 +226,34 @@ public class Oracle implements IOracle
 							       + " for the XMLModule for the tag "
 							       + name);
 		    }
-		isPersistent = false;
-		try
-		    {
-			// get if this is persistent or not
-			isPersistent = Boolean.valueOf(tk.nextToken()).booleanValue();
-		    }
-		catch (Exception e)
-		    {
-			throw new InvalidSchemaFormatException("This schema definition for tag " 
-							       + name + " is incorrectly formatted."
-							       +"The line for this tag is: "
-							       + moduleInfo + ", and the error was "
-							       + e);
-		    }
-		instanceName = " ";
-		if (isPersistent == true)
-		    {
-			try
-			    {
-				instanceName = tk.nextToken();
-			    }
-			catch (Exception e)
-			    {
-				throw new InvalidSchemaFormatException("The schema definition for "
-								       + "the tag " + name
-								       + "is incorrectly formatted. "
-								       + "The line for this tag is: "
-								       + moduleInfo + ", and the error"
-								       +" was "+ e);
-			    }
+		moduleVector.addElement(className);
 
+		while(tk.hasMoreElements())
+	    {
+	        className = tk.nextToken();
+
+		// try to get the class for this className
+
+		    className = rootPath + File.separator + moduleDir + File.separator + className;
+		    classFile = new File(className);
+		    classExists = classFile.exists();
+		    if(classExists == false)
+		    {
+			    throw new InvalidSchemaFormatException("There is no class named "+ className
+							       + " for the XMLModule for the tag "
+							       + name);
 		    }
+		    moduleVector.addElement(className);
+	    }
 		//className = className.substring(className.lastIndexOf(File.separator)+1, className.length());
-		if(className == null)
-		    className = "";
-		fragment.setModuleName(className);
+
+		fragment.setModuleName(moduleVector);
 		fragment.setIsPersistent(isPersistent);
 		fragment.setInstanceName(instanceName);
 	    }
 	else
 	    {
-		fragment.setModuleName("");
+		fragment.setModuleName(null);
 		fragment.setIsPersistent(false);
 		fragment.setInstanceName("");
 	    }
@@ -272,7 +292,7 @@ public class Oracle implements IOracle
 				    {
 					System.out.println("Property file 'oracle.prop' does not exist..");
 					System.exit(2);
-				    }	
+				    }
 				fileName = args[0] + File.separator + "psl" + File.separator + "oracle" + File.separator + "oracle.prop";
 			    }
 			String file = args[1];
@@ -317,7 +337,7 @@ public class Oracle implements IOracle
     {
 	log.println("Oracle: " + msg);
     }
-    
+
 }
 
 
