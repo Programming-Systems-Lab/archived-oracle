@@ -13,7 +13,6 @@
 
 package psl.oracle;
 
-import psl.*;
 import java.util.*;
 
 public class ElementInfo
