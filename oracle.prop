@@ -1,0 +1,3 @@
+moduleDir=psl/oracle
+defaultModuleInfo=psl/oracle/Default.class,false
+dbName=oracleDB

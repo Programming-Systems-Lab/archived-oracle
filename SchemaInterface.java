@@ -44,7 +44,7 @@ public class SchemaInterface
     public SchemaInterface()
     {
 	//code to read parameters from the property file
-	File file = new File("oracle.prop");
+	File file = new File("psl//oracle//oracle.prop");
 	Properties property = new Properties();
 	try
 	{
