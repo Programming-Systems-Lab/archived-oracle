@@ -22,7 +22,7 @@ public class DBAccessApplication
 		frame.getContentPane().setLayout(null);
 		frame.getContentPane().setBackground(new java.awt.Color(204,207,201));
 		frame.getContentPane().setFont(new Font("Dialog", Font.PLAIN, 20));
-		frame.setSize(360,213);
+		frame.setSize(360,252);
 		addJButton.setText("Add");
 		addJButton.setActionCommand("Add");
 		frame.getContentPane().add(addJButton);
@@ -34,7 +34,13 @@ public class DBAccessApplication
 		frame.getContentPane().add(deleteJButton);
 		deleteJButton.setBackground(new java.awt.Color(225,223,223));
 		deleteJButton.setFont(new Font("Dialog", Font.BOLD, 15));
-		deleteJButton.setBounds(216,120,84,24);
+		deleteJButton.setBounds(216,100,84,24);
+		exitJButton.setText("Exit");
+		exitJButton.setActionCommand("Exit");
+		frame.getContentPane().add(exitJButton);
+		exitJButton.setBackground(new java.awt.Color(225,223,223));
+		exitJButton.setFont(new Font("Dialog", Font.BOLD, 15));
+		exitJButton.setBounds(216,152,84,24);
 		titleJLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 		titleJLabel1.setText("FleXML-Oracle");
 		frame.getContentPane().add(titleJLabel1);
@@ -50,12 +56,14 @@ public class DBAccessApplication
 		SymMouse aSymMouse = new SymMouse();
 		addJButton.addMouseListener(aSymMouse);
 		deleteJButton.addMouseListener(aSymMouse);
+		exitJButton.addMouseListener(aSymMouse);
 	}
     static String rootPath = null;
 	javax.swing.JButton addJButton = new javax.swing.JButton();
 	javax.swing.JButton deleteJButton = new javax.swing.JButton();
 	javax.swing.JLabel titleJLabel1 = new javax.swing.JLabel();
 	javax.swing.JLabel titleJLabel2 = new javax.swing.JLabel();
+    javax.swing.JButton exitJButton = new javax.swing.JButton();
 
 	class SymMouse extends java.awt.event.MouseAdapter
 	{
@@ -66,8 +74,15 @@ public class DBAccessApplication
 				addJButton_mouseClicked(event);
 			else if (object == deleteJButton)
 				deleteJButton_mouseClicked(event);
+		    else if (object == exitJButton)
+				exitJButton_mouseClicked(event);
 
 		}
+	}
+
+    void exitJButton_mouseClicked(java.awt.event.MouseEvent event)
+	{
+		System.exit(1);
 	}
 
 	void addJButton_mouseClicked(java.awt.event.MouseEvent event)

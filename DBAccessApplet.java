@@ -67,11 +67,10 @@ public class DBAccessApplet extends JApplet
 				addJButton_mouseClicked(event);
 			else if (object == deleteJButton)
 				deleteJButton_mouseClicked(event);
-
 		}
 	}
 
-	void addJButton_mouseClicked(java.awt.event.MouseEvent event)
+   	void addJButton_mouseClicked(java.awt.event.MouseEvent event)
 	{
 		addJButton_mouseClicked_Interaction1(event);
 	}

@@ -57,13 +57,22 @@ public class AddJFrame extends javax.swing.JFrame
 	getContentPane().add(addJButton1);
 	addJButton1.setBackground(new java.awt.Color(225,223,223));
 	addJButton1.setFont(new Font("Dialog", Font.BOLD, 15));
-	addJButton1.setBounds(192,120,84,24);
+	addJButton1.setBounds(285,140,84,24);
+
+	closeJButton1.setText("Close");
+	closeJButton1.setActionCommand("Close");
+	getContentPane().add(closeJButton1);
+	closeJButton1.setBackground(new java.awt.Color(225,223,223));
+	closeJButton1.setFont(new Font("Dialog", Font.BOLD, 15));
+	closeJButton1.setBounds(54,140,84,24);
+
 	messageJLabel.setAutoscrolls(true);
 	getContentPane().add(messageJLabel);
 	messageJLabel.setForeground(java.awt.Color.black);
 	messageJLabel.setBounds(24,168,360,24);
 	SymMouse aSymMouse = new SymMouse();
 	addJButton1.addMouseListener(aSymMouse);
+	closeJButton1.addMouseListener(aSymMouse);
     }
 
     public AddJFrame(String sTitle, String path)
@@ -109,14 +118,14 @@ public class AddJFrame extends javax.swing.JFrame
     static String moduleInfo = null;
     static String defaultModuleInfo = null;
     static String dbLoc = null;
-    
+
     javax.swing.JLabel addJLabel = new javax.swing.JLabel();
     javax.swing.JLabel addJLabel1 = new javax.swing.JLabel();
     javax.swing.JLabel addJLabel2 = new javax.swing.JLabel();
     javax.swing.JTextField addJTextField1 = new javax.swing.JTextField();
     javax.swing.JButton addJButton1 = new javax.swing.JButton();
     static javax.swing.JLabel messageJLabel = new javax.swing.JLabel();
-
+    javax.swing.JButton closeJButton1 = new javax.swing.JButton();
 
     class SymMouse extends java.awt.event.MouseAdapter
     {
@@ -125,8 +134,16 @@ public class AddJFrame extends javax.swing.JFrame
 	    Object object = event.getSource();
 	    if (object == addJButton1)
 		addJButton1_mouseClicked(event);
+		else if (object == closeJButton1)
+		closeJButton1_mouseClicked(event);
 	}
     }
+
+    void closeJButton1_mouseClicked(java.awt.event.MouseEvent event)
+    {
+        dispose();
+        setVisible(false);
+	}
 
     void addJButton1_mouseClicked(java.awt.event.MouseEvent event)
     {
@@ -638,7 +655,7 @@ public class AddJFrame extends javax.swing.JFrame
 	ErrorJDialog ed = new ErrorJDialog();
 	ed.setMessage(msg);
     }
-    
+
 
 }
 

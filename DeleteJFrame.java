@@ -65,12 +65,20 @@ public class DeleteJFrame extends javax.swing.JFrame
 		getContentPane().add(deleteSubmitJButton);
 		deleteSubmitJButton.setBackground(new java.awt.Color(225,223,223));
 		deleteSubmitJButton.setFont(new Font("Dialog", Font.BOLD, 15));
-		deleteSubmitJButton.setBounds(144,192,84,24);
+		deleteSubmitJButton.setBounds(252,192,84,24);
 		deleteMessageLabel.setAutoscrolls(true);
+
+		closeJButton.setText("Close");
+		closeJButton.setActionCommand("Close");
+		getContentPane().add(closeJButton);
+		closeJButton.setBackground(new java.awt.Color(225,223,223));
+		closeJButton.setFont(new Font("Dialog", Font.BOLD, 15));
+		closeJButton.setBounds(56,192,84,24);
+
 		getContentPane().add(deleteMessageLabel);
 		SymMouse aSymMouse = new SymMouse();
 		deleteSubmitJButton.addMouseListener(aSymMouse);
-
+        closeJButton.addMouseListener(aSymMouse);
 	}
 
 	public DeleteJFrame(String sTitle, String path)
@@ -109,7 +117,7 @@ public class DeleteJFrame extends javax.swing.JFrame
 
 	// Used by addNotify
 	boolean frameSizeAdjusted = false;
-        
+
 
 	javax.swing.JLabel deleteJLabel = new javax.swing.JLabel();
 	javax.swing.JLabel deleteJLabel1 = new javax.swing.JLabel();
@@ -119,7 +127,7 @@ public class DeleteJFrame extends javax.swing.JFrame
 	javax.swing.JTextField deleteJTextField2 = new javax.swing.JTextField();
 	javax.swing.JButton deleteSubmitJButton = new javax.swing.JButton();
 	javax.swing.JLabel deleteMessageLabel = new javax.swing.JLabel();
-
+    javax.swing.JButton closeJButton = new javax.swing.JButton();
 
     void shutdownDB()
    {
@@ -177,7 +185,7 @@ public class DeleteJFrame extends javax.swing.JFrame
 	return null;
     }
 
-    
+
 	class SymMouse extends java.awt.event.MouseAdapter
 	{
 		public void mouseClicked(java.awt.event.MouseEvent event)
@@ -185,7 +193,15 @@ public class DeleteJFrame extends javax.swing.JFrame
 			Object object = event.getSource();
 			if (object == deleteSubmitJButton)
 				deleteSubmitJButton_mouseClicked(event);
+		    if (object == closeJButton)
+				closeJButton_mouseClicked(event);
 		}
+	}
+
+    void closeJButton_mouseClicked(java.awt.event.MouseEvent event)
+    {
+        dispose();
+        setVisible(false);
 	}
 
 	void deleteSubmitJButton_mouseClicked(java.awt.event.MouseEvent event)
