@@ -2,15 +2,11 @@
 
  * Title: SendOracleReply
 
- * Description: This class will be used to implement a mechanism to
+ * Description: This class is used to implement a mechanism to
 
- *              send the modules or module URI to Metaparser. At present
+ *              send the modules to Metaparser. 
 
- *              it is not used but it will be modify to incorporate
-
- *              Worklets functionality or other mechanism used to transfer
-
- *              the data to Metaparser.
+ *              It uses Worklets functionality to transfer the data to Metaparser.
 
  * Copyright (c) 2000: The Trustees of Columbia University and the City of New York.
 

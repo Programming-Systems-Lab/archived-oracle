@@ -1,8 +1,8 @@
 /**
  * Title: SendTriKXSignal
  * Description: This class is used to generate a Siena event for TriKX.
- *              It should be used to when Oracle needs to change its
- *              TriKX portal. The modified portal file be taken from the
+ *              It should be used when Oracle needs to change its
+ *              TriKX portal. The modified portal file is taken from the
  *              predefined location.
  * Copyright (c) 2000: The Trustees of Columbia University and the City of New York.
  *                              All Rights Reserved.

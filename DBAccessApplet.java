@@ -1,6 +1,6 @@
 /**
  * Title: DBAccessApplet
- * Description: A main frame to access Oracle database. It provides user
+ * Description: A main frame to access Oracle database from an Applet. It provides user
  *              an option of adding or deleting the tags to the database.
  * Copyright (c) 2000: The Trustees of Columbia University and the City of New York.
   *                              All Rights Reserved.

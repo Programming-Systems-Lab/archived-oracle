@@ -1,6 +1,7 @@
 /**
  * Title: DBInterfaceFrame
  * Description: This class provides an interface to the HSQL database.
+ *              It is used by GUI in order to access the database.
  *              It provides essential methods like put(key, data), get(key),
  *              remove(key) and shutdown().
  * Copyright (c) 2000: The Trustees of Columbia University and the City of New York.

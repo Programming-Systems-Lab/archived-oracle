@@ -1,7 +1,7 @@
 /**
  * Title: InvalidSchemaFormatException
  * Description: Exception is thrown when a schema information format stored
- *              in the database is not valid. Proper format ise: <fragment>,
+ *              in the database is not valid. Proper format is: <fragment>,
  *              <moduleInfo>
  *              ModuleInfo must contain module name, if persistent and instance name
  * Copyright (c) 2000: The Trustees of Columbia University and the City of New York.
