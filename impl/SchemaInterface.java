@@ -169,7 +169,7 @@ protected void addFragments() throws IOException,
     String[] moduleInfo = {"default,false,default", "default,false,default", "default,false,default"};
 
     //String fileName = getString();
-    String fileName = "d:\\kanan\\research\\psl\\psl\\oracle\\data\\personal.xsd";
+    String fileName = "d:\\kanan\\research\\psl\\psl\\oracle\\data\\frag2.xsd";
     BufferedReader inLine = new BufferedReader(new FileReader(fileName));
     BufferedWriter outLine = new BufferedWriter(new FileWriter("oracletemp.txt"));
     String line  = inLine.readLine();

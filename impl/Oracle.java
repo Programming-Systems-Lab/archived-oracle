@@ -35,6 +35,22 @@ public class Oracle implements IOracle
     {
     }
 
+public static String getPartialMatch(String name)
+{
+    if(name == null)
+        return null;
+    int index1 = name.indexOf('/');
+    int index2 = name.indexOf('/',index1+1);
+    if(index2 == -1)
+        return null;
+    else
+    {
+        int index3 = name.indexOf(',');
+        String result = name.substring(0,index3+1);
+        result = result + name.substring(index2, name.length());
+        return result;
+    }
+}
 
   /** This method gets a schema fragment for a given element.
    * All persistent objects must have an instance name associated with
@@ -176,9 +192,21 @@ public synchronized SchemaFragment getFragment(String query)
 	            namePath = type+"="+name+","+path;
 	     }
 	     data = db.get(namePath);
-         if(data == null)
-            throw new UnknownTagException("There is no schema entry for the "
+	     String modifiedPath = null;
+         if(data == null) //modified for partial matching of path(suffix)
+         {
+            modifiedPath = getPartialMatch(namePath);
+            while(modifiedPath != null)
+            {
+                data = db.get(modifiedPath);
+                if(data != null)
+                    break;
+                modifiedPath = getPartialMatch(modifiedPath);
+            }
+            if(data == null)
+                throw new UnknownTagException("There is no schema entry for the "
                                                + "tag " + name + " in the Oracle.");
+         }
      }
 
      elementInfo = ElementInfo.getElementInfo((String)data);
