@@ -20,16 +20,16 @@ public class InvalidQueryFormatException extends Throwable
   public InvalidQueryFormatException()
    {
       System.out.println("Query  does not have proper format: "
-				+ "<FleXML:schemaQuery version=\"1.0\" name="
-                                + "\"NAMESPACE:ELEMENT\"><xPath>PATH</xPath>"
-                                + "</FleXML:schemaQuery>");
+				+ "<schemaQuery version=\"1.0\" name="
+                                + "\"NAMESPACE:ELEMENT\"><xpath>PATH</xpath>"
+                                + "</schemaQuery>");
    }
 
   public InvalidQueryFormatException(String msg)
    {
-    System.out.println("Query " + msg
-                         	+ "<FleXML:schemaQuery version=\"1.0\" name="
-                                + "\"NAMESPACE:ELEMENT\"><xPath>PATH</xPath>"
-                                + "</FleXML:schemaQuery>");
+    System.out.println("Query " + msg + " does not have proper format: "
+                         	+ "<schemaQuery version=\"1.0\" name="
+                                + "\"NAMESPACE:ELEMENT\"><xpath>PATH</xpath>"
+                                + "</schemaQuery>");
    }
 }

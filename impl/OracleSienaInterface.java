@@ -35,11 +35,11 @@ public class OracleSienaInterface implements Runnable, Notifiable
 
 	/**
 	* Constructor. It sets a Siena master server running at localhost and
-	* 31337 port.
+	* 4321 port.
 	*/
 	public OracleSienaInterface()
 	{
-		String master = "senp://localhost:31337";
+		String master = "senp://localhost:4321";
 		HierarchicalDispatcher hd = new HierarchicalDispatcher();
 		try
 		{
@@ -63,7 +63,7 @@ public class OracleSienaInterface implements Runnable, Notifiable
 	/**
 	* Siena master server can be specified as command line argument.
 	* If no argument is specified then it will start it at localhost,
-	* port 31337.
+	* port 4321.
 	*/
 	public static void main(String[] args)
 	{
@@ -78,8 +78,8 @@ public class OracleSienaInterface implements Runnable, Notifiable
 		}
         	hostname = addr.toString();
             hostname = hostname.substring(hostname.indexOf('/')+1, hostname.length());
-            SendWorklet sw = new SendWorklet(hostname, "OracleRegistry");
- 		String master = "senp://localhost:31337";
+            //SendWorklet sw = new SendWorklet(hostname, "OracleRegistry");
+ 		String master = "senp://localhost:4321";
 		if (args.length > 0)
 		{
 			master = args[0];
@@ -99,6 +99,19 @@ public class OracleSienaInterface implements Runnable, Notifiable
 			ex.printStackTrace();
 		}
 		OracleSienaInterface osi = new OracleSienaInterface(hd);
+		/*Filter f = new Filter();
+		f.addConstraint("source", "psl.metaparser.Metaparser");
+		f.addConstraint("type", "query");
+		try
+		{
+			si.subscribe(f, this);
+		}
+		catch(siena.SienaException se)
+		{
+			se.printStackTrace();
+		}
+		System.out.println("Oracle subscribed to " + f);*/
+	
 		Thread t = new Thread(osi);
 		t.start();
 	}
@@ -112,7 +125,7 @@ public class OracleSienaInterface implements Runnable, Notifiable
 	public void run()
 	{
 		Filter f = new Filter();
-		f.addConstraint("source", "psl.metaparser.MPSienaInterface");
+		f.addConstraint("source", "psl.metaparser.Metaparser");
 		f.addConstraint("type", "query");
 		try
 		{
@@ -125,7 +138,6 @@ public class OracleSienaInterface implements Runnable, Notifiable
 		System.out.println("Oracle subscribed to " + f);
 	}
 
-	
 	/**
 	* This method is called when an event is received from Metaparser.
 	* It will call getFragment(String query) method of Oracle. It will
@@ -179,18 +191,18 @@ public class OracleSienaInterface implements Runnable, Notifiable
 		n.putAttribute("value", msg);
 		try
 		{
-			System.out.println("Oracle is sending back a reply");
+			System.out.println("Oracle is sending back a reply: " + msg);
 			si.publish(n);
 		}
 		catch(siena.SienaException se)
 		{
 			se.printStackTrace();
 		}
-		if(moduleName.length() > 0)
+		/*if(moduleName.length() > 0)
 		{
 			SendOracleReply sor = new SendOracleReply();
 		      sor.sendReply( responseID, MPHost, moduleName);
-		}
+		}*/
 
 	}
 

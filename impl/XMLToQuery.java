@@ -45,10 +45,14 @@ public class XMLToQuery
       throw new InvalidQueryFormatException();
     int index1 = query.indexOf(" name=");
     if(index1 == -1)
-      throw new InvalidQueryFormatException();
-    int index2 = query.indexOf('"',index1+7);
+    	throw new InvalidQueryFormatException();
+    int index2 = query.indexOf('"', index1+7);
     if(index2 == -1)
-      throw new InvalidQueryFormatException();
+    {
+	index2 = query.indexOf("'",index1+7);
+	if(index2 == -1)
+		throw new InvalidQueryFormatException();
+    }	
     String name = query.substring(index1+7, index2);
     int index3 = name.indexOf(':');
     if(index3 == -1)
@@ -72,9 +76,13 @@ public class XMLToQuery
     int index1 = query.indexOf(" name=");
     if(index1 == -1)
       throw new InvalidQueryFormatException();
-    int index2 = query.indexOf('"',index1+7);
+    int index2 = query.indexOf('"', index1+7);
     if(index2 == -1)
-      throw new InvalidQueryFormatException();
+    {
+	index2 = query.indexOf("'",index1+7);
+	if(index2 == -1)
+		throw new InvalidQueryFormatException();
+    }	
     String temp = query.substring(index1+7, index2);
     int index3 = temp.indexOf(':');
     String name = null;
@@ -95,13 +103,14 @@ public class XMLToQuery
    */
   public String getPath() throws InvalidQueryFormatException
   {
+    String path = null;
     if(query == null)
       throw new InvalidQueryFormatException();
-    int index1 = query.indexOf("<xPath>");
-    int index2 = query.indexOf("</xPath>");
+    int index1 = query.indexOf("<xpath>");
+    int index2 = query.indexOf("</xpath>");
     if((index1 == -1) || (index2 == -1))
-      throw new InvalidQueryFormatException();
-    String path = query.substring(index1+7, index2);
+      throw new InvalidQueryFormatException(query);
+    path = query.substring(index1+7, index2);
     if(path.length() < 1)
       return null;
     return path;
@@ -117,6 +126,8 @@ public class XMLToQuery
       throw new InvalidQueryFormatException();
     int index1 = query.indexOf(" type=");
     int index2 = query.indexOf('"', index1+7);
+    if(index2 == -1)
+	index2 = query.indexOf("'", index1+7);		
     if((index1 == -1) || (index2 == -1))
       throw new InvalidQueryFormatException();
     String type = query.substring(index1+7, index2);
