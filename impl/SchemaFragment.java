@@ -18,22 +18,29 @@ public class SchemaFragment
 {
     String name;
     String description;
-    String moduleName;
-    boolean isSingleton;
-    String instanceName;
+    String[] moduleName = new String[3];
+    boolean[] isPersistent = new boolean[3];
+    String[] instanceName = new String[3];
 
     public SchemaFragment()
     {
 	name = null;
 	description = null;
-	moduleName = null;
-	isSingleton = false;
-	instanceName = null;
+	int i;
+	for(i=0; i<3; i++)
+	    moduleName[i] = null;
+	for(i=0; i<3; i++)
+	    isPersistent[i] = false;
+	for(i=0; i<3; i++)
+	    instanceName[i] = null;
     }
 
     public String toString()
     {
-        return "\n" + description + "\n" + moduleName + "\n" + isSingleton + "\n" + instanceName;
+        return "\n" + description + "\n" + moduleName[0] + "," + isPersistent[0]
+               + "," + instanceName[0]+ "\n" + moduleName[1] + "," + isPersistent[1]
+               + "," + instanceName[1]+ "\n" + moduleName[2] + "," + isPersistent[2]
+               + "," + instanceName[2];
     }
 
     public String getName()
@@ -54,31 +61,31 @@ public class SchemaFragment
 	this.description = description;
     }
 
-    public String getModuleName()
+    public String getModuleName(int i)
     {
-	return moduleName;
+	return moduleName[i];
     }
-    public void setModuleName(String module)
+    public void setModuleName(String module, int i)
     {
-	this.moduleName = module;
-    }
-
-    public boolean getIsSingleton()
-    {
-	return isSingleton;
-    }
-    public void setIsSingleton(boolean singleton)
-    {
-	this.isSingleton = singleton;
+	this.moduleName[i] = module;
     }
 
-    public String getInstanceName()
+    public boolean getIsPersistent(int i)
     {
-	return instanceName;
+	return isPersistent[i];
     }
-    public void setInstanceName(String instance)
+    public void setIsPersistent(boolean persistent, int i)
     {
-	this.instanceName = instance;
+	this.isPersistent[i] = persistent;
+    }
+
+    public String getInstanceName(int i)
+    {
+	return instanceName[i];
+    }
+    public void setInstanceName(String instance, int i)
+    {
+	this.instanceName[i] = instance;
     }
 
 }

@@ -37,7 +37,7 @@ public class Oracle implements IOracle
 
 
   /** This method gets a schema fragment for a given element.
-   * All singletons must have an instance name associated with
+   * All persistent objects must have an instance name associated with
    * them so that the XML MetaParser can store this XML Module
    * and other XML Modules can get a reference to this XML Module
    * for communication.
@@ -64,6 +64,8 @@ public synchronized SchemaFragment getFragment(String query)
 	String type = null;
 	String name = null;
 	String path = null;
+	SchemaFragment fragment = new SchemaFragment();
+	
 	try
      {
 	    db = new HashtableDBInterface(dbName);
@@ -183,30 +185,39 @@ public synchronized SchemaFragment getFragment(String query)
         //System.out.println(elementInfo.getPath());
      String schema = elementInfo.getFragment();
 
-     String moduleInfo = elementInfo.getModuleInfo();
-     // parse it into each of its pieces
-	 StringTokenizer tk = new StringTokenizer(moduleInfo, ", ", false);
+     String[] moduleInfo = new String[3];
+     moduleInfo[0] = elementInfo.getModuleInfo(0);
+     moduleInfo[1] = elementInfo.getModuleInfo(1);
+     moduleInfo[2] = elementInfo.getModuleInfo(2);
      String className = null;
+     boolean isPersistent = false;
+     String instanceName = null;
 
-     try
+     // parse it into each of its pieces
+     for (int i=0;i<3;i++)
      {
+	    StringTokenizer tk = new StringTokenizer(moduleInfo[i], ", ", false);
+        className = null;
+
+        try
+        {
 		// get the className
-	    className = tk.nextToken();
-	 }
-     catch (Exception e)
-     {
-         throw new InvalidSchemaFormatException("The database for the Oracle "
+	        className = tk.nextToken();
+	    }
+        catch (Exception e)
+        {
+             throw new InvalidSchemaFormatException("The database for the Oracle "
                           	                        + "is incorrectly formatted for the "
                                                     + "element " + name + ". The line for"
                                                     + " this tag is: " + moduleInfo + " and"
                                                     + " the error was: " + e);
-	 }
+	    }
 
-	// try to get the class for this className
-	/*Class moduleClass = null;
-	try
-	{
-          moduleClass = Class.forName(className);
+	    // try to get the class for this className
+	    /*Class moduleClass = null;
+	    try
+	    {
+              moduleClass = Class.forName(className[i]);
         }
         catch (ClassNotFoundException e)
          {
@@ -215,47 +226,47 @@ public synchronized SchemaFragment getFragment(String query)
                                                        name);
          }*/
 
-    boolean isSingleton = false;
+        isPersistent = false;
 
-	try
-	{
-	    // get whether this is a singleton or not
-		isSingleton = Boolean.valueOf(tk.nextToken()).booleanValue();
-	}
+	    try
+	    {
+	        // get whether this is a persistent or not
+		    isPersistent = Boolean.valueOf(tk.nextToken()).booleanValue();
+	    }
 
-	catch (Exception e)
-	{
-	    throw new InvalidSchemaFormatException("This schema definition for tag "
+	    catch (Exception e)
+	    {
+	        throw new InvalidSchemaFormatException("This schema definition for tag "
 			            	                         + name + " is incorrectly formatted."
                                                      +"The line for this tag is: "
                                                      + moduleInfo + ", and the error was "
 						                             + e);
-	}
+	    }
 
 
-	String instanceName = " ";
-	if (isSingleton == true)
-	{
-	   try
-	   {
-	       instanceName = tk.nextToken();
-	   }
-	   catch (Exception e)
-	   {
-		    throw new InvalidSchemaFormatException("The schema definition for "
+	    instanceName = " ";
+	    if (isPersistent == true)
+	    {
+	        try
+	        {
+	            instanceName = tk.nextToken();
+	        }
+	        catch (Exception e)
+	        {
+		        throw new InvalidSchemaFormatException("The schema definition for "
 						         + "the tag " + name
 						         + "is incorrectly formatted. "
                					 + "The line for this tag is: "
 						         + moduleInfo + ", and the error"
                                  +" was "+ e);
-	   }
+	        }
+        }
+        fragment.setModuleName(className, i);
+        fragment.setIsPersistent(isPersistent, i);
+        fragment.setInstanceName(instanceName, i);
     }
-    SchemaFragment fragment = new SchemaFragment();
     fragment.setName(name);
     fragment.setDescription(schema);
-    fragment.setModuleName(className);
-    fragment.setIsSingleton(isSingleton);
-    fragment.setInstanceName(instanceName);
     db.shutdown();
     return fragment;
 }

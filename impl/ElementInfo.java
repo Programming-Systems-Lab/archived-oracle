@@ -20,15 +20,16 @@ public class ElementInfo
 { 
 	  public String key = "";
 	  public String path = "";
-        public String fragment = "";
-    	  public String moduleInfo = "";
+      public String fragment = "";
+      public String[] moduleInfo = new String[3];
         
 
   public ElementInfo() 
    {
 	 key = "";
-       fragment = "";
-       moduleInfo = "";
+     fragment = "";
+     for(int i=0; i<3; i++)
+        moduleInfo[i] = "";
 	 
    }
   
@@ -40,7 +41,7 @@ public class ElementInfo
 
   public String toString()
   {
-    return fragment + "[**]" + moduleInfo ;
+    return fragment + "[**]" + moduleInfo[0]+ "[**]" + moduleInfo[1]+ "[**]" + moduleInfo[2];
   }
   
 
@@ -54,7 +55,11 @@ public class ElementInfo
     int index1 = info.indexOf("[**]");
     ElementInfo ei = new ElementInfo();
     ei.fragment = info.substring(0, index1);
-    ei.moduleInfo = info.substring(index1+4, info.length());
+    int index2 = info.indexOf("[**]", index1+1);
+    ei.moduleInfo[0] = info.substring(index1+4, index2);
+    index1 = info.indexOf("[**]", index2+1);
+    ei.moduleInfo[1] = info.substring(index2+4, index1);
+    ei.moduleInfo[2] = info.substring(index1+4, info.length());
     return ei;
   }
   
@@ -85,13 +90,22 @@ public class ElementInfo
     this.fragment = fragment;
   }
   
-  public String getModuleInfo()
+  public String getModuleInfo(int i)
     {
-	return moduleInfo;
+	return moduleInfo[i];
     }
- public void setModuleInfo(String description)
+  public void setModuleInfo(String[] description)
     {
-	this.moduleInfo = description;
+    this.moduleInfo[0] = description[0];
+	this.moduleInfo[1] = description[1];
+	this.moduleInfo[2] = description[2];
+    }
+
+  public void setModuleInfo(String description)
+    {
+	this.moduleInfo[0] = description;
+	this.moduleInfo[1] = description;
+	this.moduleInfo[2] = description;
     }
 
 }
