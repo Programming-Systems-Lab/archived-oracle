@@ -22,7 +22,7 @@ import java.net.*;
 
 public class Oracle implements IOracle
 {
-   //Intializes database interface
+    //Intializes database interface
     Hashtable oracleQuery = new Hashtable();
     static DBInterface db = null;
     static String dbName = null;
@@ -35,58 +35,58 @@ public class Oracle implements IOracle
 	// File file = new File("oracle.prop");
 	Properties property = new Properties();
 	try
-	{
-	    property.load(new FileInputStream(file));
-	}
+	    {
+		property.load(new FileInputStream(file));
+	    }
 	catch(FileNotFoundException ffe)
-	{
-	    System.err.println("Exception: " + ffe);
-	    System.exit(0);
-	}
+	    {
+		System.err.println("Exception: " + ffe);
+		System.exit(0);
+	    }
 	catch(IOException ioe)
-	{
-	    System.err.println("Exception: "+ ioe);
-            System.exit(1);
-        }
+	    {
+		System.err.println("Exception: "+ ioe);
+		System.exit(1);
+	    }
 	dbName = property.getProperty("dbName");
 	if(dbName == null || dbName.length() < 1)
-	{
-	    System.err.println("Parameter 'sienaPort' must be set in 'oracle.prop' file.");
-	    System.exit(0);
-        }
+	    {
+		System.err.println("Parameter 'sienaPort' must be set in 'oracle.prop' file.");
+		System.exit(0);
+	    }
 	moduleDir = property.getProperty("moduleDir");
 	if(moduleDir == null || moduleDir.length() < 1)
-	{
-	    printLog("Parameter 'moduleDir' must be set in 'oracle.prop' file.");
-	    System.exit(0);
-	}
+	    {
+		printLog("Parameter 'moduleDir' must be set in 'oracle.prop' file.");
+		System.exit(0);
+	    }
     }
 
 
-  /**
+    /**
    * This method is used to get a partial match of the
    * the specified path of an element.
    */
 
-  public static String getPartialMatch(String name)
-  {
-    if(name == null)
-        return null;
-    int index1 = name.indexOf('/');
-    int index2 = name.indexOf('/',index1+1);
-    if(index2 == -1)
-        return null;
-    else
+    public static String getPartialMatch(String name)
     {
-        int index3 = name.indexOf(',');
-        String result = name.substring(0,index3+1);
-        result = result + name.substring(index2, name.length());
-        return result;
+	if(name == null)
+	    return null;
+	int index1 = name.indexOf('/');
+	int index2 = name.indexOf('/',index1+1);
+	if(index2 == -1)
+	    return null;
+	else
+	    {
+		int index3 = name.indexOf(',');
+		String result = name.substring(0,index3+1);
+		result = result + name.substring(index2, name.length());
+		return result;
+	    }
     }
-  }
 
 
-  /** This method gets a schema fragment for a given element.
+    /** This method gets a schema fragment for a given element.
    * This method returns a String that represents object Schemafragment
    * in XML format. The valid query format is : <FleXML:schemaQuery
    * version="1.0" name="NAMESPACE:ELEMENT"><xPath>PATH</xPath>
@@ -100,214 +100,215 @@ public class Oracle implements IOracle
    * is not valid.
    */
 
-  public synchronized SchemaFragment getFragment(String queryXML)
-                                        throws UnknownTagException,
-                                        InvalidQueryFormatException,
-                                        InvalidSchemaFormatException
-  {
-    ElementInfo elementInfo = null;
-    XMLToQuery xtq = new XMLToQuery(queryXML);
-    String namespace = xtq.getNamespace();
-    String name = xtq.getName();
-    String path = null;
-    path = xtq.getPath();
-    SchemaFragment fragment = new SchemaFragment();
-    try
+    public synchronized SchemaFragment getFragment(String queryXML)
+	throws UnknownTagException,
+	       InvalidQueryFormatException,
+	       InvalidSchemaFormatException
     {
-        db = new DBInterface(dbName);
-    }
-     catch(Exception e)
-    {
-        System.err.println("Error while intializing the database: "+ e);
-        System.exit(1);
-    }
+	ElementInfo elementInfo = null;
+	XMLToQuery xtq = new XMLToQuery(queryXML);
+	String namespace = xtq.getNamespace();
+	String name = xtq.getName();
+	String path = null;
+	path = xtq.getPath();
+	SchemaFragment fragment = new SchemaFragment();
+	try
+	    {
+		db = new DBInterface(dbName);
+	    }
+	catch(Exception e)
+	    {
+		System.err.println("Error while intializing the database: "+ e);
+		System.exit(1);
+	    }
    
-    String nsName = null;
-    if(namespace != null)
-    {
-      nsName = namespace+":"+name;
+	String nsName = null;
+	if(namespace != null)
+	    {
+		nsName = namespace+":"+name;
+	    }
+	Object data = null;
+	if(nsName != null)
+	    data = db.get("0." + nsName);
+	if(data == null)
+	    {
+		String namePath = null;
+		if(path == null)
+		    namePath = name;
+		else
+		    namePath = name + "," + path;
+		data = db.get("0." + namePath);
+		String modifiedPath = null;
+		if(data == null) //modified for partial matching of path(suffix)
+		    {
+			modifiedPath = getPartialMatch(namePath);
+			while(modifiedPath != null)
+			    {
+				data = db.get("0."+modifiedPath);
+				if(data != null)
+				    break;
+				modifiedPath = getPartialMatch(modifiedPath);
+			    }
+			if(data == null)
+			    throw new UnknownTagException("There is no schema entry for the "
+							  + "tag " + name + " in the Oracle.");
+		    }
+	    }
+	elementInfo = ElementInfo.getElementInfo((String)data);
+	String schema = elementInfo.getFragment();
+	String moduleInfo = elementInfo.getModuleInfo();
+	String className = null;
+	String fileName = null;
+	File classFile = null;
+	boolean classExists = false;
+	boolean isPersistent = false;
+	String instanceName = null;
+	if(moduleInfo.length() > 0)
+	    {
+		StringTokenizer tk = new StringTokenizer(moduleInfo, ", ", false);
+		try
+		    {
+			// get the className
+			className = tk.nextToken();
+		    }
+		catch (Exception e)
+		    {
+			throw new InvalidSchemaFormatException("The database for the Oracle "
+							       + "is incorrectly formatted for the "
+							       + "element " + name + ". The line for"
+							       + " this tag is: " + moduleInfo + " and"
+							       + " the error was: " + e);
+		    }
+
+		// try to get the class for this className
+
+		classFile = new File(className);
+		classExists = classFile.exists();
+		if(classExists == false)
+		    {
+			throw new InvalidSchemaFormatException("There is no class named "+ className
+							       + " for the XMLModule for the tag "
+							       + name);
+		    }
+		isPersistent = false;
+		try
+		    {
+			// get if this is persistent or not
+			isPersistent = Boolean.valueOf(tk.nextToken()).booleanValue();
+		    }
+		catch (Exception e)
+		    {
+			throw new InvalidSchemaFormatException("This schema definition for tag " 
+							       + name + " is incorrectly formatted."
+							       +"The line for this tag is: "
+							       + moduleInfo + ", and the error was "
+							       + e);
+		    }
+		instanceName = " ";
+		if (isPersistent == true)
+		    {
+			try
+			    {
+				instanceName = tk.nextToken();
+			    }
+			catch (Exception e)
+			    {
+				throw new InvalidSchemaFormatException("The schema definition for "
+								       + "the tag " + name
+								       + "is incorrectly formatted. "
+								       + "The line for this tag is: "
+								       + moduleInfo + ", and the error"
+								       +" was "+ e);
+			    }
+
+		    }
+		//className = className.substring(className.lastIndexOf(File.separator)+1, className.length());
+		fragment.setModuleName(className);
+		fragment.setIsPersistent(isPersistent);
+		fragment.setInstanceName(instanceName);
+	    }
+	else
+	    {
+		fragment.setModuleName("");
+		fragment.setIsPersistent(false);
+		fragment.setInstanceName("");
+	    }
+
+	if (namespace != null)
+	    name = namespace + ":" + name;
+	fragment.setName(name);
+	fragment.setDescription(schema);
+	db.shutdown();
+	return fragment;
     }
-    Object data = null;
-    if(nsName != null)
-      data = db.get("0." + nsName);
-    if(data == null)
-    {
-        String namePath = null;
-        if(path == null)
-             namePath = name;
-        else
-             namePath = name + "," + path;
-         data = db.get("0." + namePath);
-         String modifiedPath = null;
-         if(data == null) //modified for partial matching of path(suffix)
-         {
-            modifiedPath = getPartialMatch(namePath);
-            while(modifiedPath != null)
-            {
-                data = db.get("0."+modifiedPath);
-                if(data != null)
-                    break;
-                modifiedPath = getPartialMatch(modifiedPath);
-            }
-            if(data == null)
-                throw new UnknownTagException("There is no schema entry for the "
-                                               + "tag " + name + " in the Oracle.");
-         }
-     }
-     elementInfo = ElementInfo.getElementInfo((String)data);
-     String schema = elementInfo.getFragment();
-     String moduleInfo = elementInfo.getModuleInfo();
-     String className = null;
-     String fileName = null;
-     File classFile = null;
-     boolean classExists = false;
-     boolean isPersistent = false;
-     String instanceName = null;
-     if(moduleInfo.length() > 0)
-     {
-      StringTokenizer tk = new StringTokenizer(moduleInfo, ", ", false);
-      try
-      {
-        // get the className
-        className = tk.nextToken();
-      }
-      catch (Exception e)
-      {
-        throw new InvalidSchemaFormatException("The database for the Oracle "
-                        	                    + "is incorrectly formatted for the "
-                                                + "element " + name + ". The line for"
-                                                + " this tag is: " + moduleInfo + " and"
-                                                + " the error was: " + e);
-      }
-
-      // try to get the class for this className
-
-      classFile = new File(className);
-      classExists = classFile.exists();
-      if(classExists == false)
-      {
-         throw new InvalidSchemaFormatException("There is no class named "+ className
-                                                 + " for the XMLModule for the tag "
-                                                 + name);
-      }
-      isPersistent = false;
-      try
-      {
-        // get if this is persistent or not
-        isPersistent = Boolean.valueOf(tk.nextToken()).booleanValue();
-      }
-      catch (Exception e)
-      {
-        throw new InvalidSchemaFormatException("This schema definition for tag " 
-	            	                       + name + " is incorrectly formatted."
-                                               +"The line for this tag is: "
-                                               + moduleInfo + ", and the error was "
-						                     + e);
-      }
-      instanceName = " ";
-      if (isPersistent == true)
-      {
-        try
-	{
-            instanceName = tk.nextToken();
-	}
-	catch (Exception e)
-	{
-            throw new InvalidSchemaFormatException("The schema definition for "
-             			                   + "the tag " + name
-                                                   + "is incorrectly formatted. "
-                           			   + "The line for this tag is: "
-					           + moduleInfo + ", and the error"
-                                                   +" was "+ e);
-        }
-
-      }
-      //className = className.substring(className.lastIndexOf(File.separator)+1, className.length());
-      fragment.setModuleName(className);
-      fragment.setIsPersistent(isPersistent);
-      fragment.setInstanceName(instanceName);
-    }
-    else
-    {
-      fragment.setModuleName("");
-      fragment.setIsPersistent(false);
-      fragment.setInstanceName("");
-    }
-
-    if (namespace != null)
-         name = namespace + ":" + name;
-    fragment.setName(name);
-    fragment.setDescription(schema);
-    db.shutdown();
-    return fragment;
-  }
 
 
-  /**
+    /**
    * Oracle can receive a query from command line but a valid
    * query must be stored a file.
    */
 
-  public static void main(String args[])
-  {
-    if(args.length != 2 )
+    public static void main(String args[])
     {
-      System.out.println("USAGE: java Oracle <property file> <input file>");
-      System.exit(1);
-    }
-    else
-    {
-      try
-      {
-	File prop = new File(args[0]);
-	if(!prop.exists())
+	if(args.length != 2 )
 	    {
-		System.out.println("Property file "+ args[0] + " does not exist..");
-		System.exit(2);
+		System.out.println("USAGE: java Oracle <oracle path> <input file>");
+		System.exit(1);
 	    }
-	String file = args[1];
-        File fileName = new File(file);
-        BufferedReader br = new BufferedReader(new FileReader(fileName));
-        String name = br.readLine() ;
-	Oracle oracle = new Oracle(args[0]);
-        SchemaFragment fragment = oracle.getFragment(name);
-        SchemaFragmentToXML sfx = new SchemaFragmentToXML();
-	System.out.println(sfx.toXML(fragment));
-      }
-      catch (UnknownTagException ex)
-      {
-        db.shutdown();
-	System.exit(1);
-      }
-      catch (InvalidQueryFormatException e)
-      {
-        db.shutdown();
-	System.exit(2);
-      }
-      catch (InvalidSchemaFormatException e)
-      {
-        db.shutdown();
-        System.exit(2);
-      }
-      catch (Exception e)
-      {
-        System.err.println("The following exception occurred while "
-                           + "trying to use getFragment " + e);
-        db.shutdown();
-        System.exit(1);
-      }
+	else
+	    {
+		try
+		    {
+			String fileName = args[0] + File.separator + "oracle.prop";
+			File prop = new File(fileName);
+			if(!prop.exists())
+			    {
+				System.out.println("Property file "+ args[0] + " does not exist..");
+				System.exit(2);
+			    }
+			String file = args[1];
+			File fileN = new File(file);
+			BufferedReader br = new BufferedReader(new FileReader(fileN));
+			String name = br.readLine() ;
+			Oracle oracle = new Oracle(fileName);
+			SchemaFragment fragment = oracle.getFragment(name);
+			SchemaFragmentToXML sfx = new SchemaFragmentToXML();
+			System.out.println(sfx.toXML(fragment));
+		    }
+		catch (UnknownTagException ex)
+		    {
+			db.shutdown();
+			System.exit(1);
+		    }
+		catch (InvalidQueryFormatException e)
+		    {
+			db.shutdown();
+			System.exit(2);
+		    }
+		catch (InvalidSchemaFormatException e)
+		    {
+			db.shutdown();
+			System.exit(2);
+		    }
+		catch (Exception e)
+		    {
+			System.err.println("The following exception occurred while "
+					   + "trying to use getFragment " + e);
+			db.shutdown();
+			System.exit(1);
+		    }
+	    }
     }
-  }
 
- /**
-  * Writes messages to a log file
-  */
+    /**
+     * Writes messages to a log file
+     */
 
-  public void printLog(String msg)
-  {
+    public void printLog(String msg)
+    {
 	log.println("Oracle: " + msg);
-  }
-
+    }
+    
 }
 
 
