@@ -1,14 +1,14 @@
 /*
  * Title: SchemaInterface
- * Description:  Interface for a user to add schema fragments and files
- *               to oracle database. User can enter a file name(.xsd format).
- *               It's format willbe validated using XML parser and then
+ * Description:  Interface for a user to add schema fragments and module information
+ *               to oracle database (HSQL). User can enter a file name(.xsd format).
+ *               Its format will be validated using IBM's SAX parser and then
  *               user will be prompt to enter module information for each tag.
  *               (module name, isPersistent and instance name). User can skip
- *               this information for individual tag or for all  tags to store
- *               the default values. The tags are stored in format of namespace:
- *               element name (if namespace is available and not default) and
- *               element name,path. These will become  keys for database.
+ *               this information for individual tag or for all tags to store
+ *               the default values or null values. The tags are stored in format
+ *               of namespace:element name(if namespace is available) and
+ *               element name,path. These are the keys for the database.
  * Copyright (c) 2000: The Trustees of Columbia University and the City of New York.
  *                              All Rights Reserved.
  * @author Kanan Naik
@@ -31,7 +31,6 @@ import psl.oracle.exceptions.*;
 
 public class SchemaInterface
 {
-    //String[] moduleInfo = {"default.class,false,null","default.class,false,null","default.class,false,null"};
     String moduleInfo = "default.class,false,null";
     String defaultModuleInfo = "default.class,false,null";
     static DBInterface db = null;
@@ -51,10 +50,10 @@ public class SchemaInterface
     }
 
 /** Prompts user to add information like module name, if
-  * Persistent or not and instance name. Instance name is only
-  * stored if a module is Persistent. A user can press "Enter" to
+  * persistent or not and instance name. Instance name is only
+  * stored if a module is persistent. A user can press "Enter" to
   * store a default value for current tag or he can type 'skip' to
-  * store default values for all tags.
+  * store default values for rest of the tags in the file.
   */
 
 protected String askModuleInfo(String name)
@@ -67,9 +66,6 @@ protected String askModuleInfo(String name)
     {
         line = getString();
         line = line.trim();
-//        int totalElements = 9;
-//        int totalElements = 3;
-//        int actualElements = 0;
         if(line.equals("skip"))
         {
             moduleInfo = "skip";
@@ -83,12 +79,9 @@ protected String askModuleInfo(String name)
         File classFile = null;
         boolean classExists = false;
         StringTokenizer st = new StringTokenizer(line, ",");
-        //for (int i=0; i<3; i++)
-        //{
         if(st.hasMoreElements())
         {
             moduleName = st.nextToken();
-  //          actualElements++;
             fileName = "psl/oracle/modules/" + moduleName;
             classFile = new File(fileName);
             classExists = classFile.exists();
@@ -97,17 +90,16 @@ protected String askModuleInfo(String name)
                  System.out.println("No class exists with the name: " + moduleName
                                      +" Please enter again.");
                  moduleName ="default.class";
-                 break;
+                 continue;
             }
             if(st.hasMoreElements())
             {
                 isPersistent = st.nextToken();
-    //            actualElements++;
             }
             else
             {
                  System.out.println("Number of parameters is not valid");
-                 break;
+                 continue;
             }
             isPersistent = isPersistent.trim();
             if(!(isPersistent.equals("true") || isPersistent.equals("false")))
@@ -116,55 +108,30 @@ protected String askModuleInfo(String name)
                                      +"you have entered an instance name for a non "
                                      +"persistent module");
                  isPersistent = "false";
-                 break;
+                 continue;
             }
-      /*      if(isPersistent.equals("false") == true)
-            {
-                  totalElements--;
-            }*/
             boolean instance = st.hasMoreElements();
             if(instance && (isPersistent.equals("true")== true))
             {
                  instanceName = st.nextToken();
-               //  actualElements++;
             }
             else if(!instance && (isPersistent.equals("true")== true))
             {
                  System.out.println("Instance name must be present if a module "
                                      + "is persistent");
-                 break;
+                  continue;
             }
-            //moduleInfo[i] = moduleName+","+isPersistent+","+instanceName;
             moduleInfo = moduleName+","+isPersistent+","+instanceName;
             return moduleInfo;
-
-            /* moduleName ="";
-            isPersistent = "";
-            instanceName = "";
-                if (i==2)
-                {
-                    if(totalElements != actualElements)
-                    {
-                        System.out.println("No Instance name should present if a module "
-                                           + "is not persistent");
-                        break;
-                    }
-                    else
-                    return moduleInfo;;
-                }
-              }
-              else
-              {
-                    System.out.println("Number of parameters is not valid");
-                    break;
-              }
-        }
-        continue;*/
       }
     }
-    return moduleInfo;
 }
 
+/**
+ * This method is used to remove a record from the database. User has
+ * to specified a key value in order to delete an entry. The key format
+ * can be either namespace:element or element,path.
+ */
 protected void removeFragment()throws UnknownTagException
 {
     System.out.println("Enter the key value of a Schema fragment you want to "
@@ -194,18 +161,17 @@ protected void removeFragment()throws UnknownTagException
 
  /** This method is called when a user wants to add schema
   * fragments to the database. User is promted to enter
-  * data for every element name. .xsd file entered
-  * by a user will be validated using SAX parser.
+  * data for every element name. .xsd file entered by a user
+  * will be validated using IBM's SAX parser.
   */
 
 protected void addFragments() throws IOException,
                                   FileNotFoundException
 {
     System.out.println("Enter the name of a Schema document(.xsd format)");
-//    String[] moduleInfo = {"default.class,false,default", "default.class,false,default", "default.class,false,default"};
     String moduleInfo = "default.class,false,default";
     //String fileName = getString();
-    String fileName = "d:\\kanan\\research\\psl\\psl\\oracle\\data\\personal.xsd";
+    String fileName = "d:\\kanan\\research\\psl\\psl\\oracle\\data\\a6.xsd";
     BufferedReader inLine = new BufferedReader(new FileReader(fileName));
     BufferedWriter outLine = new BufferedWriter(new FileWriter("oracletemp.txt"));
     String line  = inLine.readLine();
@@ -248,7 +214,7 @@ protected void addFragments() throws IOException,
 /**
 * .xsd file is processed by this method. It will generate a proper
 * key value by computing a path for each element. It also parses
-* a file to store a schema fragment with each element.
+* a file to store a schema fragment for each element.
 */
 
 public void processFile(String fileName)throws IOException,
@@ -444,13 +410,17 @@ public void processFile(String fileName)throws IOException,
                   {
                       namespace = null;
                   }
-                  index1 = line.indexOf("0.");
+                  index1 = line.indexOf('"');
+                  if (index1 == -1)
+                  {
+                     index1 = line.indexOf("'");
+                  }
                   index2 = line.indexOf('"', index1+2);
                   if(index2 == -1)
                   {
-                      index2 = line.indexOf("'", index1+2);
+                       index2 = line.indexOf("'", index1+2);
                   }
-                  typeName = line.substring(index1+2, index2);
+                  typeName = line.substring(index1+1, index2);
                   level = level + 1;
                   element.add(level, new ElementInfo());
                   for(i=0; i<=level; i++)
@@ -528,9 +498,11 @@ public String modifyKeyValue(String key, int version)
 
 /**
 * This method is called by processFile() method. It receives
-* an element information in form of key and fragment. It stores
-* an element in the database. At present this method doesn't allow
-* a user to modify or overwrite an existing element.
+* an element information in form of a key and a fragment. It stores
+* an element in the database. This method also allows a user to
+* modify or overwrite an existing element. The previous entry will
+* be stored with a corresponding version number (depending upon the
+* number of times an entry was modified).
 */
 
 public void addToDB(ElementInfo element)
@@ -542,37 +514,44 @@ public void addToDB(ElementInfo element)
     {
         System.out.println("Object: " + displayKey + " already exists. Enter '0' to skip"
                            +" and '1' to modify this tag.");
-        try
+        while (true)
         {
-            int input=Integer.valueOf(getString().trim()).intValue();
+          try
+          {
+            int input = -1;
+            input=Integer.valueOf(getString().trim()).intValue();
             if(input < 0 || input > 1)
+            {
                 System.out.println("Valid values are 0 or 1. Please try again!");
+                continue;
+            }
             else
             {
-                if(input == 1)
-                {
-                    Object data = db.get(key);
-                    ElementInfo e1 = ElementInfo.getElementInfo((String)data);
-                    int version = e1.getVersion();
-                    String newKey = modifyKeyValue(key, version);
-                    version++;
-                    element.setVersion(version);
-                    db.remove(key);
-                    e1.setKey(newKey);
-                    db.put(newKey, e1.toString());
-                    addToDB(element);
-                }
+              if(input == 1)
+              {
+                Object data = db.get(key);
+                ElementInfo e1 = ElementInfo.getElementInfo((String)data);
+                int version = e1.getVersion();
+                String newKey = modifyKeyValue(key, version);
+                version++;
+                element.setVersion(version);
+                db.remove(key);
+                e1.setKey(newKey);
+                db.put(newKey, e1.toString());
+                addToDB(element);
+              }
+              break;
             }
         }
         catch(NumberFormatException e)
         {
             System.out.println("Not an integer number. Please try again!");
+            continue;
         }
-
+      }
     }
     else
     {
-//      if(moduleInfo[0].equals("skip") == false)
       if(moduleInfo.equals("skip") == false)
       {
         System.out.println("Enter information about an element " + key
@@ -581,7 +560,6 @@ public void addToDB(ElementInfo element)
                             + "key for a default value: <default><false>. "
                             +"To skip all tags enter 'skip'");
         moduleInfo = askModuleInfo(key);
-//        if(moduleInfo[0].equals("skip") == false)
         if(moduleInfo.equals("skip") == false)
             element.setModuleInfo(moduleInfo);
         else
@@ -627,6 +605,10 @@ public void addToDB(ElementInfo element)
   }
 
 
+  /**
+   * Provides user the options for adding or removing an entry in the
+   * database.
+   */
   public static void main(String[] args)
   {
       SchemaInterface schemaInterface1 = new SchemaInterface();

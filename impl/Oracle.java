@@ -1,79 +1,43 @@
 /**
-
  * Title: Oracle
-
- * Description: An implementation behind IOracle. Metaparser can send
-
- *              a query by calling getFragment(String query) method.
-
- *              If query format: <source id>,[<namespace>:]<element
-
- *              name>,<path> is not valid then InvalidQueryFormatException
-
+ * Description: An implementation behind IOracle. Metaparser sends
+ *              a query using Siena. Siena calls getFragment(String query) method.
+ *              If query format is not valid then InvalidQueryFormatException
  *              is thrown. If namespace is available then namespace +
-
- *              element name will be searched in database. If namespace
-
+ *              element name will be searched in the database. If namespace
  *              is not avavilable then element name + path will be searched
-
- *              in database. If database does not have a matching schema
-
+ *              in the database. If the database does not have a matching schema
  *              definition then UnknownTagException is thrown.
-
  * Copyright (c) 2000: The Trustees of Columbia University and the City of New York.
-
-  *                              All Rights Reserved.
-
+ *                              All Rights Reserved.
  * @author Kanan Naik
-
  * @version 1.0
-
  */
-
 
 
 package psl.oracle.impl;
 
-
-
 import psl.groupspace.impl.*;
-
 import psl.oracle.exceptions.*;
 
-
-
 import java.io.*;
-
 import java.util.*;
-
 import java.net.*;
 
-
-
-
-
 public class Oracle implements IOracle
-
 {
-
    //Intializes database interface
-
-
-
     Hashtable oracleQuery = new Hashtable();
-
     static DBInterface db = null;
-
     String dbName =  "oracleDB";
-
     public Oracle()
-
     {
-
     }
 
-
-
+  /**
+   * This method is used to get a partial match of the
+   * the specified path of an element.
+   */
   public static String getPartialMatch(String name)
   {
     if(name == null)
@@ -93,16 +57,17 @@ public class Oracle implements IOracle
 
 
   /** This method gets a schema fragment for a given element.
-   * All persistent objects must have an instance name associated with
-   * them so that the XML MetaParser can store this XML Module
-   * and other XML Modules can get a reference to this XML Module
-   * for communication.
+   * This method returns a String that represents object Schemafragment
+   * in XML format. The valid query format is : <FleXML:schemaQuery
+   * version="1.0" name="NAMESPACE:ELEMENT"><xPath>PATH</xPath>
+   * </FleXML:schemaQuery>
+   *
    * @exception UnknownTagException Thrown if there is no schema
-   * for the given 'namespace, element name' or 'element name, path'.
+   * for the given namespace and element name or element name and path.
    * @exception InvalidSchemaFormatException Thrown if the fragment stored
    * does not have a proper format.
    * @exception InvalidQueryFormatException Thrown if the format of a query
-   * is not proper.
+   * is not valid.
    */
 
   public synchronized String getFragment(String queryXML)
@@ -115,13 +80,11 @@ public class Oracle implements IOracle
     String namespace = xtq.getNamespace();
     String name = xtq.getName();
     String path = null;
-    //if (namespace == null)
     path = xtq.getPath();
-    String type = xtq.getType();
-    System.out.println("name "+name);
-    System.out.println("namespace "+namespace);
-    System.out.println("path "+path);
-    System.out.println("type "+type);
+   // System.out.println("name "+name);
+   // System.out.println("namespace "+namespace);
+   // System.out.println("path "+path);
+   // System.out.println("type "+type);
 
     SchemaFragment fragment = new SchemaFragment();
     try
@@ -138,10 +101,7 @@ public class Oracle implements IOracle
     String nsName = null;
     if(namespace != null)
     {
-      if(type == null)
-          nsName = namespace+":"+name;
-      else
-          nsName = namespace+":"+type+"="+name;
+      nsName = namespace+":"+name;
     }
     Object data = null;
     if(nsName != null)
@@ -149,20 +109,10 @@ public class Oracle implements IOracle
     if(data == null)
     {
         String namePath = null;
-        if(type == null)
-        {
-           if(path == null)
-                namePath = name;
-           else
-                namePath = name + "," + path;
-        }
+        if(path == null)
+             namePath = name;
         else
-        {
-          if(path == null)
-            namePath = type+"="+name;
-          else
-            namePath = type+"="+name+","+path;
-         }
+             namePath = name + "," + path;
          data = db.get("0." + namePath);
          String modifiedPath = null;
          if(data == null) //modified for partial matching of path(suffix)
@@ -183,10 +133,6 @@ public class Oracle implements IOracle
      elementInfo = ElementInfo.getElementInfo((String)data);
      //System.out.println(elementInfo.getPath());
      String schema = elementInfo.getFragment();
-    /* String[] moduleInfo = new String[3];
-     moduleInfo[0] = elementInfo.getModuleInfo(0);
-     moduleInfo[1] = elementInfo.getModuleInfo(1);
-     moduleInfo[2] = elementInfo.getModuleInfo(2);*/
      String moduleInfo = elementInfo.getModuleInfo();
      String className = null;
      String fileName = null;
@@ -194,10 +140,6 @@ public class Oracle implements IOracle
      boolean classExists = false;
      boolean isPersistent = false;
      String instanceName = null;
-     // parse it into each of its pieces
-//     for (int i=0;i<3;i++)
-  //   {
-//	    StringTokenizer tk = new StringTokenizer(moduleInfo[i], ", ", false);
      StringTokenizer tk = new StringTokenizer(moduleInfo, ", ", false);
      try
      {
@@ -226,7 +168,7 @@ public class Oracle implements IOracle
       isPersistent = false;
       try
       {
-        // get whether this is a persistent or not
+        // get if this is persistent or not
         isPersistent = Boolean.valueOf(tk.nextToken()).booleanValue();
       }
       catch (Exception e)
@@ -255,13 +197,9 @@ public class Oracle implements IOracle
           }
 
       }
-//      fragment.setModuleName(className, i);
-//      fragment.setIsPersistent(isPersistent, i);
-//      fragment.setInstanceName(instanceName, i);
-        fragment.setModuleName(className);
-        fragment.setIsPersistent(isPersistent);
-        fragment.setInstanceName(instanceName);
-//    }
+      fragment.setModuleName(className);
+      fragment.setIsPersistent(isPersistent);
+      fragment.setInstanceName(instanceName);
 
       fragment.setName(name);
       fragment.setDescription(schema);
@@ -271,6 +209,10 @@ public class Oracle implements IOracle
       return result;
   }
 
+  /**
+   * Oracle can receive a query from command line but a valid
+   * query must be stored a file.
+   */
 
   public static void main(String args[])
   {

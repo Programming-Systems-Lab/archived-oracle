@@ -1,3 +1,13 @@
+/**
+ * Title: HashtableDBInterface
+ * Description: An implementation to store data in a simple Hashtable.
+ * Copyright (c) 2000: The Trustees of Columbia University and the City of New York.
+  *                              All Rights Reserved.
+ * Company:      <p>
+ * @author Kanan Naik
+ * @version 1.0
+ */
+
 package psl.oracle.impl;
 
 import java.util.*;

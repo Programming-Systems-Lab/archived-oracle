@@ -1,4 +1,16 @@
-package psl.oracle.impl;
+/**
+ * Title: DBInterface
+ * Description: This class provides an interface to the HSQL database.
+ *              It provides essential methods like put(key, data), get(key),
+ *              remove(key) and shutdown().
+ * Copyright (c) 2000: The Trustees of Columbia University and the City of New York.
+  *                              All Rights Reserved.
+ * Company:      <p>
+ * @author Kanan Naik
+ * @version 1.0
+ */
+
+ package psl.oracle.impl;
 
 import java.util.*;
 import java.io.*;
@@ -7,21 +19,21 @@ import org.hsql.*;
 
 public class DBInterface
 {
-    
+
     /* Name of database */
     private String dbname;
     Connection conn = null;
     private String tableName = null;
-    
+
     /**
      * Constructor
-     *
+     * Intializes the HSQL database.
      */
-    public DBInterface(String userTableName) 
+    public DBInterface(String userTableName)
     {
       tableName = userTableName;
       dbname = userTableName+".dat";
-      
+
       try
       {
         Class.forName("org.hsql.jdbcDriver");
@@ -29,7 +41,7 @@ public class DBInterface
         Statement stat=conn.createStatement();
         stat.execute("CREATE TABLE " + userTableName + "(key varchar(2000),element varchar(20000))");
       }
-      catch(SQLException ex)//Throw an exception if table already exists 
+      catch(SQLException ex)//Throw an exception if table already exists
       {
       }
 
@@ -37,16 +49,20 @@ public class DBInterface
       {
         e.printStackTrace();
       }
-      
+
   }
 
 
+  /**
+   * This method must be called before exiting an application that
+   * uses HSQL database.
+   */
  public synchronized void shutdown()
  {
 	try
       {
 	    /* Close the db and terminate the session */
-        conn.close();	   
+        conn.close();
   	  }
       catch(Exception e)
       {
@@ -54,6 +70,10 @@ public class DBInterface
       }
  }
 
+ /**
+ * This method uses JDBC to make a connection to the database
+ * and to retrieve a record from the database.
+ */
 
  public synchronized Object get(Object queryTag)
  {
@@ -63,7 +83,7 @@ public class DBInterface
     try
     {
         Statement stat=conn.createStatement();
-        result =stat.executeQuery("SELECT element FROM " + tableName 
+        result =stat.executeQuery("SELECT element FROM " + tableName
                             +  " WHERE key = '"+ queryTag +"'");
         if(result.next()) //if object is found
             result1 = (Object)result.getString(1);
@@ -78,7 +98,9 @@ public class DBInterface
  }
 
 
-
+/**
+ * Uses JDBC connection to store a record in the database.
+ */
  public synchronized void put(Object key, Object data)
  {
     try
@@ -97,13 +119,16 @@ public class DBInterface
     }
  }
 
- 
+ /**
+  * This method can be used to remove a record from the
+  * HSQL database.
+  */
  public synchronized void remove(Object key)
  {
     try
     {
         Statement stat=conn.createStatement();
-        ResultSet result=stat.executeQuery("DELETE FROM " + tableName 
+        ResultSet result=stat.executeQuery("DELETE FROM " + tableName
                                             + " WHERE key='"+ key + "'" );
     }
     catch(SQLException ex)
@@ -111,7 +136,7 @@ public class DBInterface
         System.out.println("SQL exception: " + ex);
     }
  }
- 
+
 }
 
 

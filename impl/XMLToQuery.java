@@ -1,12 +1,15 @@
-
 /**
- * Title:        <p>
- * Description:  <p>
- * Copyright:    Copyright (c) <p>
+ * Title: XMLToQuery
+ * Description: This class is used to extract different elements (element
+ *              name, path, namespace) from the query received in an XML
+ *              format.
+ * Copyright (c) 2000: The Trustees of Columbia University and the City of New York.
+  *                              All Rights Reserved.
  * Company:      <p>
- * @author
+ * @author Kanan Naik
  * @version 1.0
  */
+
 package psl.oracle.impl;
 
 import psl.oracle.exceptions.*;
@@ -15,15 +18,27 @@ public class XMLToQuery
 {
   String query = null;
 
+  /**
+   * Constructor
+   */
   public XMLToQuery()
   {
   }
 
+  /**
+   * Set the given string as a query. It should be called
+   * before calling other methods of this class to retrieve
+   * the element values.
+   */
   public XMLToQuery(String query)
   {
     this.query = query;
   }
 
+  /**
+   * This method will return the namespace provided in the query.
+   * It will return null if namespace is not present.
+   */
   public String getNamespace() throws InvalidQueryFormatException
   {
     if(query == null)
@@ -45,6 +60,11 @@ public class XMLToQuery
     }
   }
 
+  /**
+   * This method will return the element name provided in the query.
+   * It will throw an InvalidQueryFormat exception if name is not
+   * present.
+   */
   public String getName() throws InvalidQueryFormatException
   {
     if(query == null)
@@ -69,6 +89,10 @@ public class XMLToQuery
     return name;
   }
 
+  /**
+   * This method will return the path provided in the query.
+   * It will return null if path is not present.
+   */
   public String getPath() throws InvalidQueryFormatException
   {
     if(query == null)
@@ -78,9 +102,15 @@ public class XMLToQuery
     if((index1 == -1) || (index2 == -1))
       throw new InvalidQueryFormatException();
     String path = query.substring(index1+7, index2);
+    if(path.length() < 1)
+      return null;
     return path;
   }
 
+  /**
+   * This method will return the type provided in the query.
+   * It will return null if type is not present.
+   */
   public String getType() throws InvalidQueryFormatException
   {
     if(query == null)
