@@ -16,8 +16,7 @@
 
 package psl.oracle;
 
-import psl.worklets2.wvm.*;
-import psl.worklets2.worklets.*;
+import psl.worklets.*;
 
 import java.io.*;
 
