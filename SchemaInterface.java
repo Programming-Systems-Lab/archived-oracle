@@ -173,6 +173,10 @@ public class SchemaInterface
           		{
 		            moduleName = st.nextToken();
         		    fileName = moduleDir + File.separator + moduleName;
+			   // png 12 March 2001
+		  	   // tagprocessors are actually either multiple class files or a .jar file
+			   // removing check
+			   /*
 		            classFile = new File(fileName);
         		    classExists = classFile.exists();
 		            if(classExists == false)
@@ -182,6 +186,7 @@ public class SchemaInterface
         		      moduleName = defaultModuleInfo.substring(0, index1);
 				      continue;
             		}
+			*/
 		            if(st.hasMoreElements())
         		    {
 		              isPersistent = st.nextToken();
