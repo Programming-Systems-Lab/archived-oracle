@@ -117,11 +117,11 @@ public class OracleSienaInterface implements Runnable, Notifiable
 	propFile = rootPath + File.separator + "oracle.prop";
 	if(!file.exists())
 	    {
-		file = new File(rootPath + File.separator + "psl" + File.separator + "oracle" + File.separator + "oracle.prop");
+		propFile = rootPath + File.separator + "psl" + File.separator + "oracle" + File.separator + "oracle.prop";
+		file = new File(propFile);
 		if(!file.exists())
 		    {
-			propFile = rootPath + File.separator + "psl" + File.separator + "oracle" + File.separator + "oracle.prop";
-			System.out.println("File 'oracle.prop' does not exist" + propFile);
+			System.out.println("File " + propFile + " does not exist" + propFile);
 			System.exit(2);
 		    }
 	    }
@@ -309,7 +309,7 @@ public class OracleSienaInterface implements Runnable, Notifiable
 	if (av != null)
 	    {
 		String query = av.stringValue();
-		System.out.println("Oracle got a query ");
+		System.out.println("Oracle got a query !!");
 		av = n.getAttribute("Hostname");
 		String MPHost = av.stringValue();
 		av = n.getAttribute("Source");
