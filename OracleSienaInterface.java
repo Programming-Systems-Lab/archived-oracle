@@ -17,7 +17,6 @@ import java.lang.*;
 import java.util.*;
 
 import siena.*;
-import psl.worklets.*;
 import psl.kx.*;
 
 public class OracleSienaInterface implements Runnable, Notifiable
