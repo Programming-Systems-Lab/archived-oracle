@@ -17,13 +17,14 @@ import java.util.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
 
 public class ModuleTable
 {
-    public static void showTable(Object[][] mainT, int row)
+    public static void showTable(Object[][] mainT, int row, String rootPath)
     {
         ModuleTableFrame tableFrame = new ModuleTableFrame();
-        tableFrame.showFrame(mainT, row);
+        tableFrame.showFrame(mainT, row, rootPath);
      }
 }
 
@@ -61,25 +62,41 @@ class ModuleTableModel extends AbstractTableModel
             if((moduleInfo != null) && (moduleInfo.length() > 0))
             {
                 index = moduleInfo.indexOf(',');
-                moduleName = moduleInfo.substring(0, index);
-                mainModule[i][1] = moduleName;
+                cacheable = moduleInfo.substring(0, index);
+                mainModule[i][1] = cacheable;
                 index1 = moduleInfo.indexOf(',', index+1);
-                if(index1 == -1)
+                boolean singleModule = false;
+                if(cacheable.equals("true"))
                 {
-                    mainModule[i][2] = "false";
+                    instanceName = moduleInfo.substring(index+1, index1);
+                    mainModule[i][2] = instanceName;
+                    index = index1;
+                    index1 = moduleInfo.indexOf(',', index+1);
+                }
+                if (index1 == -1)
+                {
+                    mainModule[i][3] = moduleInfo.substring(index+1,
+moduleInfo.length());
+                    singleModule = true;
                 }
                 else
+                    mainModule[i][3] = moduleInfo.substring(index+1, index1);
+                if(!singleModule)
                 {
-                    cacheable = moduleInfo.substring(index+1, index1);
-                    mainModule[i][2] = cacheable;
-                    if(cacheable.equals("true"))
+                    for(int j=4; j<=col; j++)
                     {
-                        instanceName = moduleInfo.substring(index1+1, moduleInfo.length());
-                        mainModule[i][3] = instanceName;
+                        index = index1;
+                        index1 = moduleInfo.indexOf(',', index+1);
+                        if(index1 == -1)
+                        {
+                            mainModule[i][j] = moduleInfo.substring(index+1,
+moduleInfo.length());
+                            break;
+                        }
+                        mainModule[i][j] = moduleInfo.substring(index+1, index1);
                     }
                 }
-
-            }
+           }
         }
     }
 
@@ -88,7 +105,7 @@ class ModuleTableModel extends AbstractTableModel
     }
     public int getColumnCount()
 	   	{
-	   	    return col;
+       	    return col;
 	   	}
 
 	   	public String getColumnName(int index)
@@ -98,13 +115,18 @@ class ModuleTableModel extends AbstractTableModel
 	   	        case 0:
 	   	            return "Element";
 	   	        case 1:
-	   	            return "Module Name";
-	   	        case 2:
 	   	            return "If Cacheable";
-	   	        case 3:
+	   	        case 2:
 	   	            return "Instance Name";
-	   	       default:
-	   	            return " ";
+	   	        case 3:
+	   	            return "Module Name";
+	   	        default:
+	   	        {
+	   	            if(index <= col)
+	   	                return "Module Name";
+	   	            else
+	   	                return " ";
+	   	        }
 	   	    }
 	   	}
 
@@ -144,7 +166,7 @@ class ModuleTableFrame extends JFrame
     }
 
 
-    public void showFrame(Object[][] mainT, int row)
+    public void showFrame(Object[][] mainT, int row, String rootPath)
     {
         //getContentPane().setLayout(null);
         moduleInfo = mainT;
@@ -158,21 +180,64 @@ class ModuleTableFrame extends JFrame
                 setVisible(false);
             }
         });
-        TableModel model = new ModuleTableModel(row,4, mainT);
+
+        //code to read parameters from the property file
+	    File file = new File(rootPath + File.separator + "oracle.prop");
+	    if(!file.exists())
+	    {
+		    file = new File(rootPath + File.separator + "psl" + File.separator + "oracle" + File.separator + "oracle.prop");
+		    if(!file.exists())
+		    {
+		        ErrorJDialog ed = new ErrorJDialog();
+	            ed.setMessage("File 'oracle.prop' does not exist");
+			    return;
+		    }
+	    }
+	    Properties property = new Properties();
+	    try
+	    {
+		    property.load(new FileInputStream(file));
+	    }
+	    catch(FileNotFoundException ffe)
+	    {
+	        ErrorJDialog ed = new ErrorJDialog();
+	        ed.setMessage("Exception: " + ffe);
+		    return;
+	    }
+	    catch(IOException ioe)
+	    {
+	        ErrorJDialog ed = new ErrorJDialog();
+	        ed.setMessage("Exception: "+ ioe);
+		    return;
+	    }
+	    String maxModule = property.getProperty("maxModuleNumber");
+	    if(maxModule == null || maxModule.length() < 1)
+	    {
+	        ErrorJDialog ed = new ErrorJDialog();
+	        ed.setMessage("Parameter 'maxModuleNumber' must be set in 'oracle.prop' file.");
+		    return;
+	    }
+	    int maxCol = Integer.valueOf(maxModule).intValue();
+	    TableModel model = new ModuleTableModel(row, maxCol+3, mainT);
         JTable table = new JTable(model);
-
-        JTextField nameTextField = new JTextField();
         TableColumnModel colModel = table.getColumnModel();
-        TableColumn nameCol = colModel.getColumn(1);
-        nameCol.setCellEditor(new DefaultCellEditor(nameTextField));
-
         JCheckBox cacheable = new JCheckBox();
-        TableColumn cacheableCol = colModel.getColumn(2);
+        TableColumn cacheableCol = colModel.getColumn(1);
         cacheableCol.setCellEditor(new DefaultCellEditor(cacheable));
 
         JTextField instanceTextField = new JTextField();
-        TableColumn instanceCol = colModel.getColumn(3);
+        TableColumn instanceCol = colModel.getColumn(2);
         instanceCol.setCellEditor(new DefaultCellEditor(instanceTextField));
+
+        JTextField nameTextField = new JTextField();
+
+        TableColumn nameCol;
+
+        for(int i=3; i< (maxCol+3); i++)
+        {
+            nameCol = colModel.getColumn(i);
+            nameCol.setCellEditor(new DefaultCellEditor(nameTextField));
+        }
 
         getContentPane().add(new JScrollPane(table), "Center");
         submitJButton.setText("Submit");
@@ -200,11 +265,11 @@ class ModuleTableFrame extends JFrame
 		TableModel model = new ModuleTableModel();
 		for(int row=0; row<totalRow; row++)
 		{
-		   if((model.getValueAt(row, 1) != null) &&
-		        ((model.getValueAt(row, 3)== null) ||
-                ((model.getValueAt(row, 3).toString()).length() <=0))&&
-                (model.getValueAt(row, 2) != null)&&
-                ((model.getValueAt(row, 2).toString()) == "true"))
+		   if((model.getValueAt(row, 3) != null) &&
+		        ((model.getValueAt(row, 2)== null) ||
+                ((model.getValueAt(row, 2).toString()).length() <=0))&&
+                (model.getValueAt(row, 1) != null)&&
+                ((model.getValueAt(row, 1).toString()).equals("true")))
             {
                 ErrorJDialog ed = new ErrorJDialog();
 	            ed.setMessage("Value of instance name cannot be null for "
@@ -212,32 +277,41 @@ class ModuleTableFrame extends JFrame
 	            return;
 	        }
 	    }
+	    int col = model.getColumnCount();
 	    for(int row=0; row<totalRow; row++)
 	    {
 	        String name = null;
 	        String cacheable = null;
 	        String instance = null;
-	        if (model.getValueAt(row, 1) == null)
+	        if (model.getValueAt(row, 3) == null)
 	            moduleInfo[row][1] = "";
 	        else
 	        {
-	            name = model.getValueAt(row, 1).toString();
-	            if (model.getValueAt(row, 2) == null)
-	               moduleInfo[row][1] = name +",false";
+	            name = model.getValueAt(row, 3).toString();
+	            if (model.getValueAt(row, 1) == null)
+	               moduleInfo[row][1] = "false,"+name;
 	            else
 	            {
-	                cacheable = model.getValueAt(row, 2).toString();
-	                if(cacheable == "false")
-	                    moduleInfo[row][1] = name +",false";
+	                cacheable = model.getValueAt(row, 1).toString();
+	                if(cacheable.equals("false"))
+	                    moduleInfo[row][1] = "false,"+ name;
 	                else
 	                {
-	                    instance = model.getValueAt(row, 3).toString();
-	                    moduleInfo[row][1] = name +",true,"+instance;
+	                    instance = model.getValueAt(row, 2).toString();
+	                    moduleInfo[row][1] = "true,"+instance+","+name;
 	                }
+	            }
+	            for(int i=4; i<=col; i++)
+	            {
+	                if((model.getValueAt(row, i) == null) ||
+                        ((model.getValueAt(row, i).toString()).length() <=0))
+                        break;
+                    name = model.getValueAt(row, i).toString();
+                    moduleInfo[row][1] = moduleInfo[row][1] + "," + name;
 	            }
 	        }
 	    }
 	    setVisible(false);
-        AddJFrame.addToDB(moduleInfo, totalRow);
+	    AddJFrame.addToDB(moduleInfo, totalRow);
 	}
 }

@@ -533,7 +533,7 @@ public class AddJFrame extends javax.swing.JFrame
 			String newKey = modifyKeyValue(key, version);
 			version++;
 			elementInfo.setVersion(version);
-			db.remove(key);
+			//db.remove(key);
 			elementInfo.setKey(newKey);
 			db.put(newKey, elementInfo.toString());
 	            }
@@ -554,7 +554,7 @@ public class AddJFrame extends javax.swing.JFrame
 		moduleArray[i][0] = e.nextElement();
 		i++;
 	    }
-	ModuleTable.showTable(moduleArray, row);
+	ModuleTable.showTable(moduleArray, row, rootPath);
 	return msg;
     }
 
@@ -567,6 +567,7 @@ public class AddJFrame extends javax.swing.JFrame
 	    {
 		element = (ElementInfo)moduleInfo[i][0];
 		key = element.getKey();
+		db.remove(key);
 		element.setModuleInfo(moduleInfo[i][1].toString());
 		msg = db.put(key, element.toString());
 	        if(msg != null)

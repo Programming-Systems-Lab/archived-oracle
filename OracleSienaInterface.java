@@ -244,7 +244,6 @@ public class OracleSienaInterface implements Runnable, Notifiable
 	// System.err.println("before sending reply, publishEvent =");
 	// System.err.println(" " + publishEvent);
 	Notification n = KXNotification.OracleOutputKXNotification("psl.oracle.OracleSienaInterface",srcID,MPSourceID,result,publishEvent);
-
 	try
 	    {
 		System.out.println("Oracle is sending back a reply: " + n);
