@@ -158,17 +158,17 @@ public class Oracle implements IOracle
 
     String namespace = xtq.getNamespace();
 
-    System.out.println("namespace "+namespace);
+    //System.out.println("namespace "+namespace);
 
     String name = xtq.getName();
 
-    System.out.println("name "+name);
+    //System.out.println("name "+name);
 
     String path = null;
 
     path = xtq.getPath();
 
-    System.out.println("path "+path);
+    //System.out.println("path "+path);
 
     SchemaFragment fragment = new SchemaFragment();
 

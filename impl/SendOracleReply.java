@@ -68,7 +68,7 @@ public class SendOracleReply
 
    */
 
-  public String sendReply(int key, String MPHost, String moduleName)
+  public String sendReply(String key, String MPHost, String name, String moduleName)
 
   {
 
@@ -86,7 +86,7 @@ public class SendOracleReply
 
     }
     //SendWorklet sw = new SendWorklet (wvm, MPHost, "MPRegistry", fileName);
-    SendWorklet.send(key, MPHost, "MPRegistry", fileName);
+    SendWorklet.send(key, MPHost, name, fileName);
 
     return null;
 

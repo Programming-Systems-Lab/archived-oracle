@@ -76,15 +76,16 @@ public class OracleSienaInterface implements Runnable, Notifiable
 		{
             	System.out.println("Exception occurred: " + e);
 		}
-        	hostname = addr.toString();
-            hostname = hostname.substring(hostname.indexOf('/')+1, hostname.length());
-            //SendWorklet sw = new SendWorklet(hostname, "OracleRegistry");
- 		String master = "senp://localhost:4321";
+        	hostname = addr.getHostName();
+		//hostname = addr.toString();
+		//hostname = hostname.substring(hostname.indexOf('/')+1, hostname.length());
+            SendWorklet sw = new SendWorklet(hostname, "OracleRegistry");
+ 		String master = "senp://canal.psl.cs.columbia.edu:4321";
 		if (args.length > 0)
 		{
 			master = args[0];
 		}
-		HierarchicalDispatcher hd = new HierarchicalDispatcher();
+		final HierarchicalDispatcher hd = new HierarchicalDispatcher();
 		try
 		{
 			hd.setMaster(master);
@@ -99,23 +100,17 @@ public class OracleSienaInterface implements Runnable, Notifiable
 			ex.printStackTrace();
 		}
 		OracleSienaInterface osi = new OracleSienaInterface(hd);
-		/*Filter f = new Filter();
-		f.addConstraint("source", "psl.metaparser.Metaparser");
-		f.addConstraint("type", "query");
-		try
-		{
-			si.subscribe(f, this);
-		}
-		catch(siena.SienaException se)
-		{
-			se.printStackTrace();
-		}
-		System.out.println("Oracle subscribed to " + f);*/
-	
 		Thread t = new Thread(osi);
 		t.start();
+		Runtime.getRuntime().addShutdownHook(new Thread() 
+		{ 
+			public void run() 
+			{
+				 System.out.println("Unsubscribing Siena..");
+				 hd.shutdown();
+			}
+		});; 
 	}
-
 
 
 	/**
@@ -125,7 +120,7 @@ public class OracleSienaInterface implements Runnable, Notifiable
 	public void run()
 	{
 		Filter f = new Filter();
-		f.addConstraint("source", "psl.metaparser.Metaparser");
+		f.addConstraint("source", "psl.metaparser.ParserThread");
 		f.addConstraint("type", "query");
 		try
 		{
@@ -159,6 +154,7 @@ public class OracleSienaInterface implements Runnable, Notifiable
 		n.putAttribute("ResponseID", responseID);
  		n.putAttribute("MPSrcID", MPSourceID);
 	  	n.putAttribute("MPRequestID", MPRequestID);
+		n.putAttribute("MPHostname", MPHost);
 		n.putAttribute("type", "queryResult");
 		try
 		{
@@ -191,18 +187,18 @@ public class OracleSienaInterface implements Runnable, Notifiable
 		n.putAttribute("value", msg);
 		try
 		{
-			System.out.println("Oracle is sending back a reply: " + msg);
+			System.out.println("Oracle is sending back a reply: " + n);
 			si.publish(n);
 		}
 		catch(siena.SienaException se)
 		{
 			se.printStackTrace();
 		}
-		/*if(moduleName.length() > 0)
+		if(moduleName.length() > 0)
 		{
 			SendOracleReply sor = new SendOracleReply();
-		      sor.sendReply( responseID, MPHost, moduleName);
-		}*/
+		      sor.sendReply(MPRequestID, MPHost, MPRequestID, moduleName);
+		}
 
 	}
 

@@ -32,6 +32,7 @@ public class SchemaFragmentToXML
   {
     String xmlForm = null;
     String initBuffer = "<schemaFrag version=\"1.0\" name=\"";
+    System.out.println(initBuffer);
     String name = sf.getName();
     String fragment = sf.getDescription();
     String moduleName = sf.getModuleName();
@@ -40,7 +41,7 @@ public class SchemaFragmentToXML
     String buffer = null;
     if(moduleName.length() > 0)
     {
-      buffer = name + "\"> <schema>" + fragment + "</schema> <module type=\"java1.3\""
+      buffer = name + "\"> <subschema>" + fragment + "</subschema> <module type=\"java1.3\""
                     + " cacheable=\"" + persistent + "\" instance"
                     + "=\"" + instanceName + "\">" + moduleName + "</module> "
                     + "</schemaFrag>";

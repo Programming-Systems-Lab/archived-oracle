@@ -403,6 +403,7 @@ protected void addFragments() throws IOException,
     BufferedWriter outLine = new BufferedWriter(new FileWriter("oracletemp.txt"));
 
     String line  = inLine.readLine();
+    String mainBuffer = "";
 
     if(line != null)
 
@@ -427,11 +428,9 @@ protected void addFragments() throws IOException,
     {
 
         outLine.write(line, 0, line.length());
-
-        outLine.write("\n");
-
+	  mainBuffer = mainBuffer + line;
+	  outLine.write("\n");	
         line = inLine.readLine();
-
     }
 
     outLine.close();
@@ -466,7 +465,7 @@ protected void addFragments() throws IOException,
 
     is.close();
 
-    processFile("oracletemp.txt");
+    processFile("oracletemp.txt", mainBuffer);
 
     return;
 
@@ -488,12 +487,11 @@ protected void addFragments() throws IOException,
 
 
 
-public void processFile(String fileName)throws IOException,
+public void processFile(String fileName, String mainBuffer)throws IOException,
 
                                  FileNotFoundException
 
 {
-
     BufferedReader inLine = new BufferedReader(new FileReader(fileName));
 
     String line = inLine.readLine();
@@ -521,6 +519,8 @@ public void processFile(String fileName)throws IOException,
     String typeName = null;
 
     String namespace = null;
+
+    System.out.println(mainBuffer);
 
     while(line != null)
 
@@ -555,8 +555,10 @@ public void processFile(String fileName)throws IOException,
   //                  System.out.println(line + " element name found");
 
                     level = level + 1;
+			  ElementInfo e11 = new ElementInfo();
+			  e11.setFragment(mainBuffer);
 
-                    element.add(level, new ElementInfo());
+                    element.add(level, e11);
 
                     index1 = line.indexOf("<");
 
@@ -598,13 +600,13 @@ public void processFile(String fileName)throws IOException,
 
                     elementName = line.substring(index1+1, index2);
 
-		    for(i=0; i<=level; i++)
+		        for(i=0; i<=level; i++)
 
                     {
 
                         ElementInfo e = (ElementInfo) element.get(i);
 
-                        e.setFragment((e.getFragment()).concat(line));
+                        //e.setFragment((e.getFragment()).concat(line));
 
                         element.set(i, e);
 
@@ -734,7 +736,7 @@ public void processFile(String fileName)throws IOException,
 
                         ElementInfo e = (ElementInfo) element.get(i);
 
-                        e.setFragment((e.getFragment()).concat(line));
+//                        e.setFragment((e.getFragment()).concat(line));
 
                         element.set(i, e);
 
@@ -756,7 +758,7 @@ public void processFile(String fileName)throws IOException,
 
                     ElementInfo e = (ElementInfo) element.get(i);
 
-                    e.setFragment((e.getFragment()).concat(line));
+//                    e.setFragment((e.getFragment()).concat(line));
 
                     element.set(i, e);
 
@@ -907,7 +909,7 @@ public void processFile(String fileName)throws IOException,
 
                       ElementInfo e = (ElementInfo) element.get(i);
 
-                      e.setFragment((e.getFragment()).concat(line));
+//                      e.setFragment((e.getFragment()).concat(line));
 
                       element.set(i, e);
 
@@ -953,7 +955,7 @@ public void processFile(String fileName)throws IOException,
 
                       ElementInfo e = (ElementInfo) element.get(i);
 
-                      e.setFragment((e.getFragment()).concat(line));
+                      //e.setFragment((e.getFragment()).concat(line));
 
                       element.set(i, e);
 
@@ -975,7 +977,7 @@ public void processFile(String fileName)throws IOException,
 
                 ElementInfo e = (ElementInfo) element.get(i);
 
-                e.setFragment((e.getFragment()).concat(line));
+                //e.setFragment((e.getFragment()).concat(line));
 
                 element.set(i, e);
 
@@ -1007,7 +1009,7 @@ public void processFile(String fileName)throws IOException,
 
                 ElementInfo e = (ElementInfo) element.get(i);
 
-                e.setFragment((e.getFragment()).concat(line));
+                //e.setFragment((e.getFragment()).concat(line));
 
                 element.set(i, e);
 

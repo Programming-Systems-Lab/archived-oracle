@@ -22,7 +22,7 @@ public class SendWorklet {
   {
       wvm = new WVM(this, host, name);
   }
-  public static void send(int key, String rHost, String rName, String moduleName) {
+  public static void send(String key, String rHost, String rName, String moduleName) {
     //WVM wvm = new WVM(this, host, name);
     {
       System.out.println(key);

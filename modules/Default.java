@@ -10,12 +10,19 @@
 
 
 
-public class Default {
+public class Default implements Def {
 
   public Default()
   {
     System.out.println("Must be modified by a default class for any tag.");
   }
+ 	
+
+public void dummy()
+{
+	System.out.println("Must be modified by a default class for any tag.");
+
+}
 
   public static void main(String[] args)
   {
