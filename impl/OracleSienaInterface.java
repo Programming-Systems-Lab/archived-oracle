@@ -1,34 +1,21 @@
 package psl.oracle.impl;
 
-
-
 import java.io.*;
-
 import java.net.*;
-
 import java.lang.*;
 
-
-
 import siena.*;
-
 import psl.oracle.exceptions.*;
 
-
-
 public class OracleSienaInterface implements Runnable, Notifiable
-
 {
-
     static Siena si = null;
-
     public OracleSienaInterface(Siena s)
     {
         this.si = s;
     }
 
     public OracleSienaInterface()
-
     {
         String master = "senp://localhost:31337";
         HierarchicalDispatcher hd = new HierarchicalDispatcher();
@@ -51,9 +38,8 @@ public class OracleSienaInterface implements Runnable, Notifiable
         t.start();
     }
 
-    
-    public static void main(String[] args)
 
+    public static void main(String[] args)
     {
         String master = "senp://localhost:31337";
         if (args.length > 0)
@@ -128,141 +114,74 @@ public class OracleSienaInterface implements Runnable, Notifiable
 
 
     public void processMPQuery(String query, String MPHost, String MPSource)
-
     {
-
-     SchemaFragment fragment = new SchemaFragment();
-
+    // SchemaFragment fragment = new SchemaFragment();
+        String fragment = null;
 	Oracle oracle = new Oracle();
-
 	Notification  n = new Notification();
-
 	String msg = null;
-
-	boolean result = false;
-
+        boolean result = false;
 	InetAddress addr = null;
-
 	try
-
 	{
-
           addr = InetAddress.getLocalHost();
-
 	}
-
         catch(Exception e)
-
-	{
-
-	  System.out.println("Exception occurred: " + e);
-
-	}
-
-	String hostname = addr.toString();
-
-	long time = System.currentTimeMillis();
-
-	n.putAttribute("hostname", hostname);
-
-	n.putAttribute("source", "psl.oracle.impl.OracleSienaInterface");
-
-	n.putAttribute("instance", "OracleSienaInteface1");
-
-	n.putAttribute("timestamp", time);
-
-	n.putAttribute("type", "queryResult");
-
-	try
-
-	{
-
-	    fragment = oracle.getFragment(query, "query");
-
-        }
-
-	catch (UnknownTagException ex)
-
         {
-
-	    msg = "Exception occured at Oracle: " + ex;
-
+	  System.out.println("Exception occurred: " + e);
 	}
-
-	catch (InvalidQueryFormatException e)
-
-	{
-
-	    msg = "Exception occured at Oracle: " + e;
-
-        }
-
-        catch (InvalidSchemaFormatException e)
-
-	{
-
-	    msg = "Exception occured at Oracle: " + e;
-
-	}
-
-	catch (Exception e)
-
-	{
-
-	    msg = "Exception occured at Oracle: " + e;
-
-	}
-
-        if(msg == null) //no exception occurred while retrieving a fragment
-
-	{
-
-	    result = true;
-
-            StartWebServer sws = new StartWebServer();
-
-            msg = sws.startServer();
-
-            if (msg != null) //exception occured while starting a server
-
-            {
-
-              result = false;
-
-            }
-
-            else //send fragment now
-
-            {
-
-	      msg = fragment.toString();
-
-            }
-
-	}
-
-	n.putAttribute("queryResult", result);
-
-	n.putAttribute("value", msg);
-
+	String hostname = addr.toString();
+	long time = System.currentTimeMillis();
+	n.putAttribute("hostname", hostname);
+	n.putAttribute("source", "psl.oracle.impl.OracleSienaInterface");
+	n.putAttribute("instance", "OracleSienaInteface1");
+	n.putAttribute("timestamp", time);
+	n.putAttribute("type", "queryResult");
 	try
-
 	{
-
+	    fragment = oracle.getFragment(query);
+        }
+	catch (UnknownTagException ex)
+        {
+	    msg = "Exception occured at Oracle: " + ex;
+	}
+	catch (InvalidQueryFormatException e)
+	{
+	    msg = "Exception occured at Oracle: " + e;
+        }
+        catch (InvalidSchemaFormatException e)
+	{
+	    msg = "Exception occured at Oracle: " + e;
+	}
+	catch (Exception e)
+	{
+	    msg = "Exception occured at Oracle: " + e;
+	}
+        if(msg == null) //no exception occurred while retrieving a fragment
+	{
+	    result = true;
+            StartWebServer sws = new StartWebServer();
+            msg = sws.startServer();
+            if (msg != null) //exception occured while starting a server
+            {
+              result = false;
+            }
+            else //send fragment now
+            {
+	      msg = fragment.toString();
+            }
+	}
+	n.putAttribute("queryResult", result);
+	n.putAttribute("value", msg);
+	try
+	{
 	    System.out.println("Oracle is sending back a reply");
-
 	    si.publish(n);
-
 	}
-
 	catch(siena.SienaException se)
-
 	{
-
 	    se.printStackTrace();
-
 	}
-
     }
 
 
@@ -465,9 +384,9 @@ public class OracleSienaInterface implements Runnable, Notifiable
 
             System.out.println("Oracle error: MP query is null.");
 
-          } 
+          }
 
-          
+
 
     }
 

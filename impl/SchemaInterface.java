@@ -31,8 +31,9 @@ import psl.oracle.exceptions.*;
 
 public class SchemaInterface
 {
-    String[] moduleInfo = {"psl/oracle/impl/default.class,false,null","psl/oracle/impl/default.class,false,null","psl/oracle/impl/default.class,false,null"};
-    String defaultModuleInfo = "psl/oracle/impl/default.class,false,null";
+    //String[] moduleInfo = {"default.class,false,null","default.class,false,null","default.class,false,null"};
+    String moduleInfo = "default.class,false,null";
+    String defaultModuleInfo = "default.class,false,null";
     static DBInterface db = null;
     String dbName = "oracleDB";
     public SchemaInterface()
@@ -56,80 +57,90 @@ public class SchemaInterface
   * store default values for all tags.
   */
 
-protected String[] askModuleInfo(String name)
+protected String askModuleInfo(String name)
 {
     String line = null;
-    String moduleName = "psl/oracle/impl/default.class";
+    String moduleName = "default.class";
     String isPersistent = "false";
     String instanceName = "null";
-     while(true)
+    while(true)
     {
         line = getString();
         line = line.trim();
-        int totalElements = 9;
-        int actualElements = 0;
+//        int totalElements = 9;
+//        int totalElements = 3;
+//        int actualElements = 0;
         if(line.equals("skip"))
         {
-            moduleInfo[0] = "skip";
+            moduleInfo = "skip";
             return moduleInfo;
         }
         if(line.equals("") == true)
         {
             return moduleInfo;
         }
-
+        String fileName = null;
+        File classFile = null;
+        boolean classExists = false;
         StringTokenizer st = new StringTokenizer(line, ",");
-        for (int i=0; i<3; i++)
+        //for (int i=0; i<3; i++)
+        //{
+        if(st.hasMoreElements())
         {
+            moduleName = st.nextToken();
+  //          actualElements++;
+            fileName = "psl/oracle/modules/" + moduleName;
+            classFile = new File(fileName);
+            classExists = classFile.exists();
+            if(classExists == false)
+            {
+                 System.out.println("No class exists with the name: " + moduleName
+                                     +" Please enter again.");
+                 moduleName ="default.class";
+                 break;
+            }
             if(st.hasMoreElements())
             {
-                moduleName = st.nextToken();
-                actualElements++;
-                Class moduleClass = null;
-                try
-                {
-                    moduleClass = Class.forName(moduleName);
-                }
-                catch (ClassNotFoundException e)
-                {
-                    System.out.println("No class exists with the name: " + moduleName
-                                        +" Please enter again.");
-                    moduleName ="psl/oracle/impl/default.class";
-                    break;
-                }
-                if(st.hasMoreElements())
-                {
-                    isPersistent = st.nextToken();
-                    actualElements++;
-                }
-                else
-                {
-                   System.out.println("Number of parameters is not valid");
-                   break;
-                }
-                isPersistent = isPersistent.trim();
-                if(!(isPersistent.equals("true") || isPersistent.equals("false")))
-                {
-                    System.out.println("Value of isPersistent is niether true nor false OR "
-                                        +"you have entered an instance name for a non "
-                                        +"persistent module");
-                    isPersistent = "false";
-                    break;
-                }
-                if(isPersistent.equals("false") == true)
-                {
-                    totalElements--;
-                }
-                if(st.hasMoreElements() && (isPersistent.equals("true")== true))
-                {
-                    instanceName = st.nextToken();
-                    actualElements++;
-                }
-                //break;
-                moduleInfo[i] = moduleName+","+isPersistent+","+instanceName;
-                moduleName ="";
-                isPersistent = "";
-                instanceName = "";
+                isPersistent = st.nextToken();
+    //            actualElements++;
+            }
+            else
+            {
+                 System.out.println("Number of parameters is not valid");
+                 break;
+            }
+            isPersistent = isPersistent.trim();
+            if(!(isPersistent.equals("true") || isPersistent.equals("false")))
+            {
+                 System.out.println("Value of isPersistent is niether true nor false OR "
+                                     +"you have entered an instance name for a non "
+                                     +"persistent module");
+                 isPersistent = "false";
+                 break;
+            }
+      /*      if(isPersistent.equals("false") == true)
+            {
+                  totalElements--;
+            }*/
+            boolean instance = st.hasMoreElements();
+            if(instance && (isPersistent.equals("true")== true))
+            {
+                 instanceName = st.nextToken();
+               //  actualElements++;
+            }
+            else if(!instance && (isPersistent.equals("true")== true))
+            {
+                 System.out.println("Instance name must be present if a module "
+                                     + "is persistent");
+                 break;
+            }
+            //moduleInfo[i] = moduleName+","+isPersistent+","+instanceName;
+            moduleInfo = moduleName+","+isPersistent+","+instanceName;
+            return moduleInfo;
+
+            /* moduleName ="";
+            isPersistent = "";
+            instanceName = "";
                 if (i==2)
                 {
                     if(totalElements != actualElements)
@@ -148,9 +159,10 @@ protected String[] askModuleInfo(String name)
                     break;
               }
         }
-        continue;
-
+        continue;*/
+      }
     }
+    return moduleInfo;
 }
 
 protected void removeFragment()throws UnknownTagException
@@ -190,10 +202,10 @@ protected void addFragments() throws IOException,
                                   FileNotFoundException
 {
     System.out.println("Enter the name of a Schema document(.xsd format)");
-    String[] moduleInfo = {"psl/oracle/impl/default.class,false,default", "psl/oracle/impl/default.class,false,default", "psl/oracle/impl/default.class,false,default"};
-
+//    String[] moduleInfo = {"default.class,false,default", "default.class,false,default", "default.class,false,default"};
+    String moduleInfo = "default.class,false,default";
     //String fileName = getString();
-    String fileName = "d:\\kanan\\research\\psl\\psl\\oracle\\data\\schema1.xsd";
+    String fileName = "d:\\kanan\\research\\psl\\psl\\oracle\\data\\personal.xsd";
     BufferedReader inLine = new BufferedReader(new FileReader(fileName));
     BufferedWriter outLine = new BufferedWriter(new FileWriter("oracletemp.txt"));
     String line  = inLine.readLine();
@@ -271,6 +283,7 @@ public void processFile(String fileName)throws IOException,
                 if((line.charAt(j) == 'n') && (line.charAt(j+1) == 'a') &&
                    (line.charAt(j+2) == 'm') && (line.charAt(j+3) == 'e'))
                  {
+  //                  System.out.println(line + " element name found");
                     level = level + 1;
                     element.add(level, new ElementInfo());
                     index1 = line.indexOf("<");
@@ -336,13 +349,19 @@ public void processFile(String fileName)throws IOException,
                 else if((line.charAt(j) == 'r') && (line.charAt(j+1) == 'e') &&
                       (line.charAt(j+2) == 'f')) //if element ref found
                 {
-                    index1 = line.indexOf("0.");
+//                    System.out.println(line + " element ref found");
+//                    index1 = line.indexOf("0.");
+                    index1 = line.indexOf('"');
+                    if (index1 == -1)
+                    {
+                      index1 = line.indexOf("'");
+                    }
                     index2 = line.indexOf('"', index1+2);
                     if(index2 == -1)
                     {
                          index2 = line.indexOf("'", index1+2);
                     }
-                    elementName = line.substring(index1+2, index2);
+                    elementName = line.substring(index1+1, index2);
                     int indexPath = mainPath.lastIndexOf('/');
                     String parent =mainPath.substring(indexPath+1, mainPath.length());
                     String path = (String)paths.get(parent);
@@ -350,6 +369,7 @@ public void processFile(String fileName)throws IOException,
                         path = path.concat("/" + elementName);
                     else
                         path = mainPath.concat("/" + elementName);
+                    System.out.println(path +" path for element "+elementName);
                     paths.put(elementName, path);
                     for(i=0; i<=level; i++)
                    {
@@ -361,6 +381,7 @@ public void processFile(String fileName)throws IOException,
               }  //name not found
               else if((line.indexOf("element>")) != -1)
               {
+    //            System.out.println(line + " element> found");
                 for(i=0; i<=level; i++)
                 {
                     ElementInfo e = (ElementInfo) element.get(i);
@@ -393,6 +414,7 @@ public void processFile(String fileName)throws IOException,
           } //element found
           else if(line.indexOf(" name=") != -1) //check for type
           {
+      //       System.out.println(line + " may be type name found");
              String type = null;
              if(line.indexOf("type name=") != -1)
               {
@@ -550,16 +572,17 @@ public void addToDB(ElementInfo element)
     }
     else
     {
-      if(moduleInfo[0].equals("skip") == false)
+//      if(moduleInfo[0].equals("skip") == false)
+      if(moduleInfo.equals("skip") == false)
       {
         System.out.println("Enter information about an element " + key
-                            + " in format: <pre proc. modulename>, <isPersistent>,"
-                            +"<instancename>, <inner proc. modulename>, <isPersistent>,"
-                            +"<instancename>, <post proc. modulename>, <isPersistent>,"
+                            + " in format: <modulename>, <isPersistent>,"
                             +"<instancename>. Press an 'Enter' "
-                            + "key for a default value: <default><false>. To skip all tags enter 'skip'");
+                            + "key for a default value: <default><false>. "
+                            +"To skip all tags enter 'skip'");
         moduleInfo = askModuleInfo(key);
-        if(moduleInfo[0].equals("skip") == false)
+//        if(moduleInfo[0].equals("skip") == false)
+        if(moduleInfo.equals("skip") == false)
             element.setModuleInfo(moduleInfo);
         else
             element.setModuleInfo(defaultModuleInfo);

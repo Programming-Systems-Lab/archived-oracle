@@ -6,7 +6,7 @@
  *              definition(tag definition for an element), modulename
  *              associated with this tag, if a module is singleton or
  *              not and instance name if it is singleton.
- * Copyright (c) 2000: The Trustees of Columbia University and the City of New York. 
+ * Copyright (c) 2000: The Trustees of Columbia University and the City of New York.
   *                              All Rights Reserved.
  * @author Kanan Naik
  * @version 1.0
@@ -18,29 +18,38 @@ public class SchemaFragment
 {
     String name;
     String description;
-    String[] moduleName = new String[3];
-    boolean[] isPersistent = new boolean[3];
-    String[] instanceName = new String[3];
+    //String[] moduleName = new String[3];
+    //boolean[] isPersistent = new boolean[3];
+    //String[] instanceName = new String[3];
+    String moduleName = null;
+    boolean isPersistent = false;
+    String instanceName = null;
+
 
     public SchemaFragment()
     {
 	name = null;
 	description = null;
-	int i;
+	/*int i;
 	for(i=0; i<3; i++)
 	    moduleName[i] = null;
 	for(i=0; i<3; i++)
 	    isPersistent[i] = false;
 	for(i=0; i<3; i++)
-	    instanceName[i] = null;
+	   instanceName[i] = null;*/
+        moduleName = null;
+        isPersistent = false;
+        instanceName = null;
     }
 
     public String toString()
     {
-        return "\n" + description + "\n" + moduleName[0] + "," + isPersistent[0]
+      /*  return "\n" + description + "\n" + moduleName[0] + "," + isPersistent[0]
                + "," + instanceName[0]+ "\n" + moduleName[1] + "," + isPersistent[1]
                + "," + instanceName[1]+ "\n" + moduleName[2] + "," + isPersistent[2]
-               + "," + instanceName[2];
+               + "," + instanceName[2];*/
+        return "\n" + description + "\n" + moduleName + "," + isPersistent
+               + "," + instanceName;
     }
 
     public String getName()
@@ -61,7 +70,7 @@ public class SchemaFragment
 	this.description = description;
     }
 
-    public String getModuleName(int i)
+   /* public String getModuleName(int i)
     {
 	return moduleName[i];
     }
@@ -86,8 +95,34 @@ public class SchemaFragment
     public void setInstanceName(String instance, int i)
     {
 	this.instanceName[i] = instance;
+    }*/
+
+    public String getModuleName()
+    {
+	return moduleName;
+    }
+    public void setModuleName(String module)
+    {
+	this.moduleName = module;
     }
 
+    public boolean isPersistent()
+    {
+	return isPersistent;
+    }
+    public void setIsPersistent(boolean persistent)
+    {
+	this.isPersistent = persistent;
+    }
+
+    public String getInstanceName()
+    {
+	return instanceName;
+    }
+    public void setInstanceName(String instance)
+    {
+	this.instanceName = instance;
+    }
 }
 
 

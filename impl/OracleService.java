@@ -278,8 +278,8 @@ public class OracleService implements GroupspaceService,
 
 			System.out.println("Got tag " + query);
 
-			SchemaFragment fragment = new SchemaFragment();
-
+			//SchemaFragment fragment = new SchemaFragment();
+                        String fragment = null;
 			Oracle oracle = new Oracle();
 
 			try
@@ -292,7 +292,7 @@ public class OracleService implements GroupspaceService,
 
 				gc.groupspaceEvent(geMsg);
 
-				fragment = oracle.getFragment(query, null);
+				fragment = oracle.getFragment(query);
 
 			  }
 
@@ -304,7 +304,7 @@ public class OracleService implements GroupspaceService,
 
 				GroupspaceEvent geMsg = new GroupspaceEvent(msg, "OracleEventMessage", null, msg, true);
 
-				gc.groupspaceEvent(geMsg);	
+				gc.groupspaceEvent(geMsg);
 
 	                  return;
 

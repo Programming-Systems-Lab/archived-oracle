@@ -22,7 +22,8 @@ public class ElementInfo
       public int version = 0;
       public String path = "";
       public String fragment = "";
-      public String[] moduleInfo = new String[3];
+//      public String[] moduleInfo = new String[3];
+      public String moduleInfo = null;
 
 
   public ElementInfo()
@@ -30,8 +31,8 @@ public class ElementInfo
      key = "";
      version = 0;
      fragment = "";
-     for(int i=0; i<3; i++)
-        moduleInfo[i] = "";
+//     for(int i=0; i<3; i++)
+      moduleInfo = "";
 
    }
 
@@ -43,7 +44,8 @@ public class ElementInfo
 
   public String toString()
   {
-    return String.valueOf(version) + "[**]" + fragment + "[**]" + moduleInfo[0]+ "[**]" + moduleInfo[1]+ "[**]" + moduleInfo[2];
+//    return String.valueOf(version) + "[**]" + fragment + "[**]" + moduleInfo[0]+ "[**]" + moduleInfo[1]+ "[**]" + moduleInfo[2];
+      return String.valueOf(version) + "[**]" + fragment + "[**]" + moduleInfo;
   }
 
 
@@ -60,11 +62,12 @@ public class ElementInfo
     ei.version = Integer.parseInt(vers);
     int index1 = info.indexOf("[**]", index+3);
     ei.fragment = info.substring(index+4, index1);
-    int index2 = info.indexOf("[**]", index1+1);
+    ei.moduleInfo = info.substring(index1+4, info.length());
+/*    int index2 = info.indexOf("[**]", index1+1);
     ei.moduleInfo[0] = info.substring(index1+4, index2);
     index1 = info.indexOf("[**]", index2+1);
     ei.moduleInfo[1] = info.substring(index2+4, index1);
-    ei.moduleInfo[2] = info.substring(index1+4, info.length());
+    ei.moduleInfo[2] = info.substring(index1+4, info.length());*/
     return ei;
   }
 
@@ -104,7 +107,7 @@ public class ElementInfo
     this.fragment = fragment;
   }
 
-  public String getModuleInfo(int i)
+/*  public String getModuleInfo(int i)
     {
 	return moduleInfo[i];
     }
@@ -120,6 +123,14 @@ public class ElementInfo
 	this.moduleInfo[0] = description;
 	this.moduleInfo[1] = description;
 	this.moduleInfo[2] = description;
-    }
+    }*/
 
+    public String getModuleInfo()
+    {
+	return moduleInfo;
+    }
+  public void setModuleInfo(String description)
+    {
+        this.moduleInfo = description;
+    }
 }

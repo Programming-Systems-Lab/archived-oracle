@@ -13,9 +13,9 @@ public class SendOracleReply
   public String sendReply(SchemaFragment fragment, String MPHost, String MPSource)
   {
     String msg = null;
-    for(int i=0; i<3; i++)
-    {
-      String moduleName = fragment.getModuleName(i);
+    //for(int i=0; i<3; i++)
+    //{
+      String moduleName = fragment.getModuleName();
       System.out.println(moduleName);
       File classFile = new File(moduleName);
       boolean classExists = classFile.exists();
@@ -30,7 +30,7 @@ public class SendOracleReply
       //make an http connection tp MPHost at some random port
       //do some fileoutputstream - etc to create and dump the class file at
       //modules directory in payh given by MPSource
-     }
+  //   }
          return null;
   }
 }
