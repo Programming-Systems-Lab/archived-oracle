@@ -3,8 +3,8 @@
  * Title: InvalidQueryFormatException
  * Description: Exception is thrown when a query format (<src id>,[<namespace>:],
  *		    <element name>,<path>) received from Metaparser is not valid.
- * Copyright:    Copyright (c) <p>
- * Company:      <p>
+ * Copyright (c) 2000: The Trustees of Columbia University and the City of New York. 
+ *                     All Rights Reserved.
  * @author Kanan Naik
  * @version 1.0
  */

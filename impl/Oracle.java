@@ -29,7 +29,8 @@ public class Oracle implements IOracle
 {
    //Intializes database interface
 
-    static DBInterface db = null;
+    static HashtableDBInterface db = null;
+    String dbName = "oracleDB";
     public Oracle()
     {
       
@@ -102,7 +103,7 @@ public class Oracle implements IOracle
 
 	try
        {
-	    db = new DBInterface();
+	    db = new HashtableDBInterface(dbName);
 	 }
       catch(Exception e)
 	 {

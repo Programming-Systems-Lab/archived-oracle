@@ -5,8 +5,8 @@
  *              in database is not valid. Proper format should be: <fragment>, 
  *              <moduleInfo>
  *              ModuleInfo must contain module name, if singleton and instance name
- * Copyright:    Copyright (c) <p>
- * Company:      <p>
+ * Copyright (c) 2000: The Trustees of Columbia University and the City of New York. 
+  *                              All Rights Reserved.
  * @author Kanan Naik
  * @version 1.0
  */

@@ -9,7 +9,7 @@
  *               the default values. The tags are stored in format of namespace:
  *               element name (if namespace is available and not default) and
  *               element name,path. These will become  keys for database.
- * Copyright (c) 2000: The Trustees of Columbia University and the City of New York. 
+ * Copyright (c) 2000: The Trustees of Columbia University and the City of New York.
   *                              All Rights Reserved.
  * @author Kanan Naik
  * @version 1.0
@@ -33,12 +33,13 @@ public class SchemaInterface
 {
     String moduleInfo = "default,false,default";
     String defaultModuleInfo = "default,false,default";
-    static DBInterface db = null;
+    static HashtableDBInterface db = null;
+    String dbName = "oracleDB";
     public SchemaInterface()
     {
         try
           {
-            db = new DBInterface();
+            db = new HashtableDBInterface(dbName);
           }
         catch(Exception e)
           {
@@ -123,7 +124,7 @@ protected String askModuleInfo(String name)
 }
 
  /** This method is called when a user wants to add schema
-  * fragments to the database. User is promted to enter 
+  * fragments to the database. User is promted to enter
   * data for every element name. .xsd file entered
   * by a user will be validated using SAX parser.
   */
@@ -134,7 +135,8 @@ protected String askModuleInfo(String name)
 	System.out.println("Enter the name of a Schema document(.xsd format)");
 	moduleInfo = "default,false,default";
         String fileName = getString();
-       	BufferedReader inLine = new BufferedReader(new FileReader(fileName));
+	//String fileName = "d:\\kanan\\research\\psl\\psl\\oracle\\data\\test.txt";
+	BufferedReader inLine = new BufferedReader(new FileReader(fileName));
 	BufferedWriter outLine = new BufferedWriter(new FileWriter("oracletemp.txt"));
       String line  = inLine.readLine();
 	if(line != null)
@@ -147,7 +149,7 @@ protected String askModuleInfo(String name)
 				System.exit(1);
 		}
 	while((line.indexOf("<schema ") != -1) && (line.indexOf(":schema ") != -1))
-	{	
+	{
 		line = inLine.readLine();
 		line = line.trim();
 		if(line.indexOf("<?xml") != -1)
@@ -158,7 +160,7 @@ protected String askModuleInfo(String name)
 	}
 
 	if((line.indexOf("<schema ") != -1) && (line.indexOf(":schema ") != -1))
-	{	
+	{
 		System.out.println("Format of .xsd file is not valid. Tag <schema> "
 					+ "is expected.");
 		db.shutdown();
@@ -175,7 +177,7 @@ protected String askModuleInfo(String name)
 	}
 	outLine.close();
       inLine.close();
-	
+
 	FileInputStream is = new FileInputStream("oracletemp.txt");
          //Verify the format of schema file.
         try
@@ -193,15 +195,15 @@ protected String askModuleInfo(String name)
         processFile("oracletemp.txt");
 	  return;
     }
-     
+
 /**
-* .xsd file is processed by this method. It will generate a proper 
+* .xsd file is processed by this method. It will generate a proper
 * key value by computing a path for each element. It also parses
 * a file to store a schema fragment with each element.
 */
-  
+
 public void processFile(String fileName)throws IOException,
-							     FileNotFoundException	
+							     FileNotFoundException
 {
         BufferedReader inLine = new BufferedReader(new FileReader(fileName));
         String line = inLine.readLine();
@@ -219,7 +221,7 @@ public void processFile(String fileName)throws IOException,
 
         while(line != null)
           {
-		index = line.indexOf("element");	
+		index = line.indexOf("element");
 		if(index != -1) //element found
 		{
 			j=index+8;
@@ -229,7 +231,7 @@ public void processFile(String fileName)throws IOException,
                     	{
                       		j++;
 	                  }
-            	      if((line.charAt(j) == 'n') && (line.charAt(j+1) == 'a') &&   
+            	      if((line.charAt(j) == 'n') && (line.charAt(j+1) == 'a') &&
 	                    (line.charAt(j+2) == 'm') && (line.charAt(j+3) == 'e'))
                         {
 					level = level + 1;
@@ -246,16 +248,16 @@ public void processFile(String fileName)throws IOException,
 					{
 						namespace = null;
 					}
-					index1 = line.indexOf('"');
-                        	index2 = line.indexOf('"', index1+1);
-                        	elementName = line.substring(index1+1, index2);
+      					index1 = line.indexOf('"');
+                                	index2 = line.indexOf('"', index1+1);
+                                	elementName = line.substring(index1+1, index2);
 					for(i=0; i<=level; i++)
 					{
 						ElementInfo e = (ElementInfo) element.get(i);
 						e.setFragment((e.getFragment()).concat(line));
-                  			element.set(i, e);
+                  	        		element.set(i, e);
 					}
-				
+
 					ElementInfo e1 = (ElementInfo)element.get(level);
 					mainPath = mainPath.concat("/" + elementName);
 					if(paths.get(elementName) == null)
@@ -264,30 +266,30 @@ public void processFile(String fileName)throws IOException,
 					}
 					else
 					{
-						String temp = (String)paths.get(elementName);		
+						String temp = (String)paths.get(elementName);
 						e1.setPath(temp);
 					}
 
-					if(namespace != null)
-					{
-						e1.setKey(namespace + ":" + elementName);
-						element.set(level, e1);
-					}
-					else
-					{
-						e1.setKey(elementName + "," + e1.getPath());
-						element.set(level, e1);
-					}
-
-					index1 = line.indexOf("/>");
+       					e1.setKey(elementName + "," + e1.getPath());
+					element.set(level, e1);
+                                        index1 = line.indexOf("/>");
 					if(index1 != -1)
 					{
 						ElementInfo e = (ElementInfo) element.get(level);
 						addToDB(e);
-						element.remove(level);
-						int indexPath = mainPath.indexOf("/" + elementName);
-						mainPath = mainPath.substring(0, indexPath);
-						level --;
+                                        }
+                                        if(namespace != null)
+					{
+						e1.setKey(namespace + ":" + elementName);
+					        if(index1 != -1)
+					        {
+						  ElementInfo e = (ElementInfo) element.get(level);
+  						  addToDB(e);
+  			                	  element.remove(level);
+						  int indexPath = mainPath.indexOf("/" + elementName);
+						  mainPath = mainPath.substring(0, indexPath);
+						  level --;
+                                                }
 					}
             	    }
 			else if((line.charAt(j) == 'r') && (line.charAt(j+1) == 'e') &&
@@ -300,7 +302,7 @@ public void processFile(String fileName)throws IOException,
 					String parent =mainPath.substring(indexPath+1, 							   mainPath.length());
 					String path = (String)paths.get(parent);
 					if( path != null)
-						path = path.concat("/" + elementName);	
+						path = path.concat("/" + elementName);
 					else
 						path = mainPath.concat("/" + elementName);
 					paths.put(elementName, path);
@@ -310,7 +312,7 @@ public void processFile(String fileName)throws IOException,
 						e.setFragment((e.getFragment()).concat(line));
 						element.set(i, e);
 					}
-					
+
 			    }
 			}
 			else  if((line.indexOf("element>")) != -1)
@@ -319,35 +321,38 @@ public void processFile(String fileName)throws IOException,
 				{
 					ElementInfo e = (ElementInfo) element.get(i);
 					e.setFragment((e.getFragment()).concat(line));
-					element.set(i, e);	
+					element.set(i, e);
 				}
 				ElementInfo e = (ElementInfo) element.get(level);
-				addToDB(e);
-				element.remove(level);
 				String key = e.getKey();
 				index = key.indexOf(':');
 				if(index == -1)
 				{
 					index1 = key.indexOf(',');
 					elementName = key.substring(0, index1);
+                                        addToDB(e);
 				}
 				else
 				{
 					elementName = key.substring(index+1, key.length());
 				}
+
+                                e.setKey(elementName + "," + e.getPath());
+				addToDB(e);
+				element.remove(level);
 				int indexPath = mainPath.indexOf("/" + elementName);
 				mainPath = mainPath.substring(0, indexPath);
 				level --;
 			}
-       	}
+       	        }
 		else //element not found
 		{
 			for(i=0; i<=level; i++)
 			{
 				ElementInfo e = (ElementInfo) element.get(i);
 				e.setFragment((e.getFragment()).concat(line));
-				element.set(i, e);	
-			}			
+				element.set(i, e);
+			}
 		}
 		line = inLine.readLine();
 	}
@@ -373,10 +378,10 @@ public void addToDB(ElementInfo element)
     {
 	  if(moduleInfo.equals("skip") == false)
         {
-              System.out.println("Enter information about an element " + key 
+              System.out.println("Enter information about an element " + key
               + " in format: <modulename>, <issingleton>, <instancename>. Press an 'Enter' "
               + "key for a default value: <defualt><false>. To skip all tags enter 'skip'");
-                  	      
+
 		  moduleInfo = askModuleInfo(key);
 		  if(moduleInfo.equals("skip") == false)
 			element.setModuleInfo(moduleInfo);
