@@ -1,6 +1,8 @@
 package psl.oracle.impl;
 
 import java.io.*;
+import java.net.*;
+import java.lang.*;
 
 import siena.*;
 import psl.oracle.exceptions.*;
@@ -66,7 +68,22 @@ public class OracleSienaInterface implements Runnable, Notifiable
 		Oracle oracle = new Oracle();
 		Notification  n = new Notification();
 		String msg = null;
+		boolean result = false;
+		InetAddress addr = null;
+		try
+		{
+		    addr = InetAddress.getLocalHost();
+		}
+		catch(Exception e)
+		{
+		    System.out.println("Exception occurred: " + e);
+		}
+		String hostname = addr.toString();
+		long time = System.currentTimeMillis();
+		n.putAttribute("hostname", hostname);
 		n.putAttribute("source", "psl.oracle.impl.OracleSienaInterface");
+		n.putAttribute("instance", "OracleSienaInteface1");
+		n.putAttribute("timestamp", time);
 		n.putAttribute("type", "queryResult");
 		try
 		{
@@ -90,12 +107,14 @@ public class OracleSienaInterface implements Runnable, Notifiable
 		}
         if(msg == null)
 		{
-		    msg = fragment.toString();
+		    result = true;
+		   // msg = fragment.toString();
 		}
-		n.putAttribute("queryResult", msg);
-		
+		n.putAttribute("queryResult", result);
+		n.putAttribute("value", msg);
 		try
 		{
+		    System.out.println("Oracle is sending back a reply");
 		    si.publish(n);
 		}
 		catch(siena.SienaException se)
