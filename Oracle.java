@@ -29,9 +29,9 @@ public class Oracle implements IOracle
     static String moduleDir = null;
     PrintWriter log = null;
 
-    public Oracle()
+    public Oracle(String propFile)
     {
-	File file = new File("psl//oracle//oracle.prop");
+	File file = new File(propFile);
 	// File file = new File("oracle.prop");
 	Properties property = new Properties();
 	try
@@ -222,7 +222,7 @@ public class Oracle implements IOracle
         }
 
       }
-      className = className.substring(className.lastIndexOf(File.separator)+1, className.length());
+      //className = className.substring(className.lastIndexOf(File.separator)+1, className.length());
       fragment.setModuleName(className);
       fragment.setIsPersistent(isPersistent);
       fragment.setInstanceName(instanceName);
@@ -250,20 +250,26 @@ public class Oracle implements IOracle
 
   public static void main(String args[])
   {
-    if(args.length == 0 )
+    if(args.length != 2 )
     {
-      System.out.println("USAGE: java Oracle <file name>");
+      System.out.println("USAGE: java Oracle <property file> <input file>");
       System.exit(1);
     }
     else
     {
       try
       {
-	String file = args[0];
+	File prop = new File(args[0]);
+	if(!prop.exists())
+	    {
+		System.out.println("Property file "+ args[0] + " does not exist..");
+		System.exit(2);
+	    }
+	String file = args[1];
         File fileName = new File(file);
         BufferedReader br = new BufferedReader(new FileReader(fileName));
         String name = br.readLine() ;
-	Oracle oracle = new Oracle();
+	Oracle oracle = new Oracle(args[0]);
         SchemaFragment fragment = oracle.getFragment(name);
         SchemaFragmentToXML sfx = new SchemaFragmentToXML();
 	System.out.println(sfx.toXML(fragment));
@@ -303,3 +309,7 @@ public class Oracle implements IOracle
   }
 
 }
+
+
+
+

@@ -43,7 +43,7 @@ public class SchemaFragment
     }
     public void setName(String name)
     {
-	this.name = name;
+       	this.name = name;
     }
 
     public String getDescription()

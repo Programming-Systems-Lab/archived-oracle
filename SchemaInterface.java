@@ -40,11 +40,12 @@ public class SchemaInterface
     static DBInterface db = null;
     String dbName = null;
     PrintWriter log = null;
+    static String propFile = null;
 
     public SchemaInterface()
     {
 	//code to read parameters from the property file
-	File file = new File("psl//oracle//oracle.prop");
+	File file = new File(propFile);
 	// File file = new File("oracle.prop");
 	Properties property = new Properties();
 	try
@@ -217,7 +218,7 @@ public class SchemaInterface
 		                continue;
         		    }
 		            moduleInfo = moduleDir+File.separator+moduleName+","+isPersistent+","+instanceName;
-        		    return moduleInfo;
+			    return moduleInfo;
           		}
       		}
     	}
@@ -711,6 +712,12 @@ public class SchemaInterface
 
   public static void main(String[] args)
   {
+      if(args.length != 1)
+      {
+	  System.out.println("Usage: java psl.oracle.SchemaInterface <property file>");
+	  System.exit(1);
+      }
+      propFile = args[0];
       SchemaInterface schemaInterface1 = new SchemaInterface();
       int input=0;
       while(true)

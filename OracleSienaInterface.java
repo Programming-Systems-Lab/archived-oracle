@@ -25,6 +25,7 @@ public class OracleSienaInterface implements Runnable, Notifiable
         static String hostname = null;
         static String sienaPort = null;
         PrintWriter log = null;
+        static String propFile = null;
         // PrintWriter log = new PrintWriter(System.err);
 
 	/**
@@ -41,7 +42,7 @@ public class OracleSienaInterface implements Runnable, Notifiable
 	*/
 	public OracleSienaInterface()
 	{
-	    File file = new File("psl//oracle//oracle.prop");
+	    File file = new File(propFile);
 	    // File file = new File("oracle.prop");
 	    Properties property = new Properties();
 	    try
@@ -92,12 +93,19 @@ public class OracleSienaInterface implements Runnable, Notifiable
 	*/
 	public static void main(String[] args)
 	{
-	    if((args.length < 1) || (args.length > 2)) 
+	    if((args.length < 2) || (args.length > 3)) 
 	    {
-		System.out.println("Usage: java psl.oracle.OracleSienaInterface <port number> [<hostname>]");
+		System.out.println("Usage: java psl.oracle.OracleSienaInterface <property file> <port number> [<hostname>]");
 		System.exit(1);
 	    }
-	    sienaPort = args[0];
+	    propFile = args[0];
+	    File file = new File(propFile);
+	    if(!file.exists())
+		{
+		    System.out.println("File " + propFile + " does not exist.");
+		    System.exit(2);
+		}
+	    sienaPort = args[1];
 	    if(sienaPort == null || sienaPort.length() < 1)
 	    {
 
@@ -179,7 +187,7 @@ public class OracleSienaInterface implements Runnable, Notifiable
 		Hashtable publishEvent = new Hashtable();
 		SchemaFragment fragment = new SchemaFragment();
      		String moduleName = null;
-		Oracle oracle = new Oracle();
+		Oracle oracle = new Oracle(propFile);
  		String msg = null;
 		boolean result = false;
 		publishEvent.put("Hostname", new AttributeValue(hostname));
