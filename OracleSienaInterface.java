@@ -25,6 +25,7 @@ public class OracleSienaInterface implements Runnable, Notifiable
         static String hostname = null;
         static String sienaPort = null;
         PrintWriter log = null;
+        // PrintWriter log = new PrintWriter(System.err);
 
 	/**
 	* Constructor. Set the specified Siena object as the default.
@@ -40,8 +41,8 @@ public class OracleSienaInterface implements Runnable, Notifiable
 	*/
 	public OracleSienaInterface()
 	{
-	    // File file = new File("psl//oracle//oracle.prop");
-	    File file = new File("oracle.prop");
+	    File file = new File("psl//oracle//oracle.prop");
+	    // File file = new File("oracle.prop");
 	    Properties property = new Properties();
 	    try
 	    {
@@ -181,10 +182,10 @@ public class OracleSienaInterface implements Runnable, Notifiable
 		Oracle oracle = new Oracle();
  		String msg = null;
 		boolean result = false;
-		publishEvent.put("Hostname", hostname);
+		publishEvent.put("Hostname", new AttributeValue(hostname));
 		int srcID = this.hashCode();
-	  	publishEvent.put("MPRequestID", MPRequestID);
-		publishEvent.put("MPHostname", MPHost);
+	  	publishEvent.put("MPRequestID", new AttributeValue(MPRequestID));
+		publishEvent.put("MPHostname", new AttributeValue(MPHost));
 		
 		try
 		{
@@ -213,10 +214,12 @@ public class OracleSienaInterface implements Runnable, Notifiable
 		      SchemaFragmentToXML sfx = new SchemaFragmentToXML();
 		      msg = sfx.toXML(fragment);
 		}
-		publishEvent.put("Value", msg);
+		publishEvent.put("Value", new AttributeValue(msg));
 
 		//create a notification using KXNotification
 
+		// System.err.println("before sending reply, publishEvent =");
+		// System.err.println(" " + publishEvent);
      		Notification n = KXNotification.OracleOutputKXNotification("psl.oracle.OracleSienaInterface",srcID,MPSourceID,result,publishEvent);
 
 		try
