@@ -32,12 +32,13 @@ public class DBInterfaceFrame
     public DBInterfaceFrame(String userTableName)
     {
       tableName = userTableName;
-      dbname = userTableName+".dat";
+      dbname = userTableName;
 
       try
       {
         Class.forName("org.hsql.jdbcDriver");
-        conn=DriverManager.getConnection("jdbc:HypersonicSQL:dbname","sa","");
+	String server = "jdbc:HypersonicSQL:" + dbname;
+        conn=DriverManager.getConnection(server,"sa","");
         Statement stat=conn.createStatement();
         stat.execute("CREATE TABLE " + userTableName + "(key varchar(2000),element varchar(20000))");
       }
@@ -146,6 +147,11 @@ public class DBInterfaceFrame
 
 
 }
+
+
+
+
+
 
 
 

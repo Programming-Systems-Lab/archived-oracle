@@ -18,10 +18,12 @@ import java.util.*;
 public class DeleteJFrame extends javax.swing.JFrame
 {
     DBInterfaceFrame db = null;
-    String dbName = null;
-
-	public DeleteJFrame()
+    String dbName = "oracleDB";
+    String rootPath = null;
+    String dbLoc = null;
+	public DeleteJFrame(String path)
 	{
+	    rootPath = path;
 		getContentPane().setLayout(null);
 		getContentPane().setBackground(new java.awt.Color(204,207,201));
 		setSize(387,289);
@@ -71,9 +73,9 @@ public class DeleteJFrame extends javax.swing.JFrame
 
 	}
 
-	public DeleteJFrame(String sTitle)
+	public DeleteJFrame(String sTitle, String path)
 	{
-		this();
+		this(path);
 		setTitle(sTitle);
 	}
 
@@ -84,10 +86,6 @@ public class DeleteJFrame extends javax.swing.JFrame
 		super.setVisible(b);
 	}
 
-	static public void main(String args[])
-	{
-		(new DeleteJFrame()).setVisible(true);
-	}
 
 	public void addNotify()
 	{
@@ -111,6 +109,7 @@ public class DeleteJFrame extends javax.swing.JFrame
 
 	// Used by addNotify
 	boolean frameSizeAdjusted = false;
+        
 
 	javax.swing.JLabel deleteJLabel = new javax.swing.JLabel();
 	javax.swing.JLabel deleteJLabel1 = new javax.swing.JLabel();
@@ -129,45 +128,56 @@ public class DeleteJFrame extends javax.swing.JFrame
 
 
     String initializeParam()
-	{
-	    //code to read parameters from the property file
-	    File file = new File("oracle.prop");
-        if(file.exists() ==  false)
-        {
-            deleteMessageLabel.setText("File 'oracle.prop' must exist");
-            return "error";
-        }
-        Properties property = new Properties();
-        try
-        {
-            property.load(new FileInputStream(file));
-        }
-        catch(FileNotFoundException ffe)
-        {
-            deleteMessageLabel.setText("Exception: " + ffe);
-        }
-        catch(IOException ioe)
-        {
-            deleteMessageLabel.setText("Exception: "+ ioe);
-        }
-        dbName = property.getProperty("dbName");
-        if(dbName == null || dbName.length() < 1)
-        {
-            deleteMessageLabel.setText("Parameter 'dbName' must be set in 'oracle.prop' file.");
-            return "error";
-        }
-        try
-        {
-            db = new DBInterfaceFrame(dbName);
-        }
-        catch(Exception e)
-        {
-            deleteMessageLabel.setText("Exception in database: " + e);
-            shutdownDB();
-        }
-        return null;
-   }
+    {
+	String msg = null;
+	//code to read parameters from the property file
+	File file = new File(rootPath + File.separator + "oracle.prop");
+	if(!file.exists())
+	    {
+		file = new File(rootPath + File.separator + "psl" + File.separator + "oracle" + File.separator + "oracle.prop");
+		if(!file.exists())
+		    {
+			printError("File 'oracle.prop' does not exist");
+			return "error";
+		    }
+	    }
+	Properties property = new Properties();
+	try
+	    {
+		property.load(new FileInputStream(file));
+	    }
+	catch(FileNotFoundException ffe)
+	    {
+		printError("Exception: " + ffe);
+		return "error";
+	    }
+	catch(IOException ioe)
+	    {
+		printError("Exception: "+ ioe);
+		return "error";
+	    }
+	dbLoc = property.getProperty("dbLocation");
+	if(dbLoc == null || dbLoc.length() < 1)
+	    {
+		printError("Parameter 'dbLocation' must be set in 'oracle.prop' file.");
+		return "error";
+	    }
+	//property file code end here
+	try
+	    {
+		//dbName = dbLoc + File.separator + dbName;
+		db = new DBInterfaceFrame(dbName);
+	    }
+	catch(Exception e)
+	    {
+		printError("Exception in database: " + e);
+		msg = db.shutdown();
+		return "error";
+	    }
+	return null;
+    }
 
+    
 	class SymMouse extends java.awt.event.MouseAdapter
 	{
 		public void mouseClicked(java.awt.event.MouseEvent event)
@@ -211,4 +221,10 @@ public class DeleteJFrame extends javax.swing.JFrame
 	        }
 	    }
 	}
+
+     public static void printError(String msg)
+    {
+	ErrorJDialog ed = new ErrorJDialog();
+	ed.setMessage(msg);
+    }
 }

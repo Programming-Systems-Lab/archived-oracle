@@ -24,159 +24,160 @@ import org.xml.sax.*;
 public class AddJFrame extends javax.swing.JFrame
 {
     int numRow = -1;
-	public AddJFrame()
+    String rootPath = null;
+    public AddJFrame(String path)
+    {
+	rootPath = path;
+	getContentPane().setLayout(null);
+	getContentPane().setBackground(new java.awt.Color(204,207,201));
+	setSize(399,222);
+	setVisible(false);
+	addJLabel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+	addJLabel.setText("Add Tags");
+	getContentPane().add(addJLabel);
+	addJLabel.setForeground(java.awt.Color.black);
+	addJLabel.setFont(new Font("Dialog", Font.BOLD, 20));
+	addJLabel.setBounds(144,12,108,36);
+	addJLabel1.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+	addJLabel1.setText("Select a name");
+	getContentPane().add(addJLabel1);
+	addJLabel1.setForeground(java.awt.Color.black);
+	addJLabel1.setFont(new Font("Dialog", Font.BOLD, 12));
+	addJLabel1.setBounds(24,72,108,24);
+	addJLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+	addJLabel2.setText("of the .xsd file");
+	getContentPane().add(addJLabel2);
+	addJLabel2.setForeground(java.awt.Color.black);
+	addJLabel2.setFont(new Font("Dialog", Font.BOLD, 12));
+	addJLabel2.setBounds(24,96,108,24);
+	getContentPane().add(addJTextField1);
+	addJTextField1.setBounds(144,84,225,24);
+	addJButton1.setText("Parse");
+	addJButton1.setActionCommand("Parse");
+	getContentPane().add(addJButton1);
+	addJButton1.setBackground(new java.awt.Color(225,223,223));
+	addJButton1.setFont(new Font("Dialog", Font.BOLD, 15));
+	addJButton1.setBounds(192,120,84,24);
+	messageJLabel.setAutoscrolls(true);
+	getContentPane().add(messageJLabel);
+	messageJLabel.setForeground(java.awt.Color.black);
+	messageJLabel.setBounds(24,168,360,24);
+	SymMouse aSymMouse = new SymMouse();
+	addJButton1.addMouseListener(aSymMouse);
+    }
+
+    public AddJFrame(String sTitle, String path)
+    {
+	this(path);
+	setTitle(sTitle);
+    }
+
+    public void setVisible(boolean b)
+    {
+	if (b)
+	    setLocation(50, 50);
+	super.setVisible(b);
+    }
+
+
+    public void addNotify()
+    {
+	// Record the size of the window prior to calling parents addNotify.
+	Dimension size = getSize();
+
+	super.addNotify();
+
+	if (frameSizeAdjusted)
+	    return;
+	frameSizeAdjusted = true;
+
+	// Adjust size of frame according to the insets and menu bar
+	Insets insets = getInsets();
+	javax.swing.JMenuBar menuBar = getRootPane().getJMenuBar();
+	int menuBarHeight = 0;
+	if (menuBar != null)
+	    menuBarHeight = menuBar.getPreferredSize().height;
+	setSize(insets.left + insets.right + size.width, insets.top + insets.bottom + size.height + menuBarHeight);
+    }
+
+    // Used by addNotify
+    boolean frameSizeAdjusted = false;
+    static String dbName = "oracleDB";
+    static String moduleDir = null;
+    static String oraclePath = null;
+    static DBInterfaceFrame db = null;
+    static String moduleInfo = null;
+    static String defaultModuleInfo = null;
+    static String dbLoc = null;
+    
+    javax.swing.JLabel addJLabel = new javax.swing.JLabel();
+    javax.swing.JLabel addJLabel1 = new javax.swing.JLabel();
+    javax.swing.JLabel addJLabel2 = new javax.swing.JLabel();
+    javax.swing.JTextField addJTextField1 = new javax.swing.JTextField();
+    javax.swing.JButton addJButton1 = new javax.swing.JButton();
+    static javax.swing.JLabel messageJLabel = new javax.swing.JLabel();
+
+
+    class SymMouse extends java.awt.event.MouseAdapter
+    {
+	public void mouseClicked(java.awt.event.MouseEvent event)
 	{
-		getContentPane().setLayout(null);
-		getContentPane().setBackground(new java.awt.Color(204,207,201));
-		setSize(399,222);
-		setVisible(false);
-		addJLabel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-		addJLabel.setText("Add Tags");
-		getContentPane().add(addJLabel);
-		addJLabel.setForeground(java.awt.Color.black);
-		addJLabel.setFont(new Font("Dialog", Font.BOLD, 20));
-		addJLabel.setBounds(144,12,108,36);
-		addJLabel1.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-		addJLabel1.setText("Select a name");
-		getContentPane().add(addJLabel1);
-		addJLabel1.setForeground(java.awt.Color.black);
-		addJLabel1.setFont(new Font("Dialog", Font.BOLD, 12));
-		addJLabel1.setBounds(24,72,108,24);
-		addJLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-		addJLabel2.setText("of the .xsd file");
-		getContentPane().add(addJLabel2);
-		addJLabel2.setForeground(java.awt.Color.black);
-		addJLabel2.setFont(new Font("Dialog", Font.BOLD, 12));
-		addJLabel2.setBounds(24,96,108,24);
-		getContentPane().add(addJTextField1);
-		addJTextField1.setBounds(144,84,225,24);
-		addJButton1.setText("Parse");
-		addJButton1.setActionCommand("Parse");
-		getContentPane().add(addJButton1);
-		addJButton1.setBackground(new java.awt.Color(225,223,223));
-		addJButton1.setFont(new Font("Dialog", Font.BOLD, 15));
-		addJButton1.setBounds(192,120,84,24);
-		messageJLabel.setAutoscrolls(true);
-		getContentPane().add(messageJLabel);
-		messageJLabel.setForeground(java.awt.Color.black);
-		messageJLabel.setBounds(24,168,360,24);
-		SymMouse aSymMouse = new SymMouse();
-		addJButton1.addMouseListener(aSymMouse);
+	    Object object = event.getSource();
+	    if (object == addJButton1)
+		addJButton1_mouseClicked(event);
 	}
+    }
 
-	public AddJFrame(String sTitle)
-	{
-		this();
-		setTitle(sTitle);
-	}
-
-	public void setVisible(boolean b)
-	{
-		if (b)
-			setLocation(50, 50);
-		super.setVisible(b);
-	}
-
-	static public void main(String args[])
-	{
-		(new AddJFrame()).setVisible(true);
-	}
-
-	public void addNotify()
-	{
-		// Record the size of the window prior to calling parents addNotify.
-		Dimension size = getSize();
-
-		super.addNotify();
-
-		if (frameSizeAdjusted)
-			return;
-		frameSizeAdjusted = true;
-
-		// Adjust size of frame according to the insets and menu bar
-		Insets insets = getInsets();
-		javax.swing.JMenuBar menuBar = getRootPane().getJMenuBar();
-		int menuBarHeight = 0;
-		if (menuBar != null)
-			menuBarHeight = menuBar.getPreferredSize().height;
-		setSize(insets.left + insets.right + size.width, insets.top + insets.bottom + size.height + menuBarHeight);
-	}
-
-	// Used by addNotify
-	boolean frameSizeAdjusted = false;
-	static String dbName = null;
-	static String moduleDir = null;
-	static String oraclePath = null;
-	static DBInterfaceFrame db = null;
-
-	javax.swing.JLabel addJLabel = new javax.swing.JLabel();
-	javax.swing.JLabel addJLabel1 = new javax.swing.JLabel();
-	javax.swing.JLabel addJLabel2 = new javax.swing.JLabel();
-	javax.swing.JTextField addJTextField1 = new javax.swing.JTextField();
-	javax.swing.JButton addJButton1 = new javax.swing.JButton();
-	static javax.swing.JLabel messageJLabel = new javax.swing.JLabel();
-
-
-	class SymMouse extends java.awt.event.MouseAdapter
-	{
-		public void mouseClicked(java.awt.event.MouseEvent event)
-		{
-			Object object = event.getSource();
-			if (object == addJButton1)
-				addJButton1_mouseClicked(event);
-		}
-	}
-
-	void addJButton1_mouseClicked(java.awt.event.MouseEvent event)
-	{
-		String msg = initialize();
-		messageJLabel.setText("Processing started ...");
-		if(msg != null)
-		    return;
-		String fileName = addJTextField1.getText();
-		File file = new File(fileName);
-	    if(!file.exists())
-		{
-		    printError("File " + fileName + " does not exist");
-		    return;
-		}
-		BufferedReader inLine = null;
+    void addJButton1_mouseClicked(java.awt.event.MouseEvent event)
+    {
+	String msg = initialize();
+	messageJLabel.setText("Processing started ...");
+	if(msg != null)
+	    return;
+	String fileName = addJTextField1.getText();
+	File file = new File(fileName);
+	if(!file.exists())
+	    {
+		printError("File " + fileName + " does not exist");
+		return;
+	    }
+	BufferedReader inLine = null;
     	BufferedWriter outLine = null;
     	String line = null;
-	    try
+	try
 	    {
-		    inLine = new BufferedReader(new FileReader(fileName));
-		    outLine = new BufferedWriter(new FileWriter("oracletemp.txt"));
-		    line  = inLine.readLine();
+		inLine = new BufferedReader(new FileReader(fileName));
+		outLine = new BufferedWriter(new FileWriter("oracletemp.txt"));
+		line  = inLine.readLine();
 	    }
-	    catch (Exception e)
+	catch (Exception e)
 	    {
-		    printError("Error on file read/write:" +
-e.getMessage());
-            return;
+		printError("Error on file read/write:" +
+			   e.getMessage());
+		return;
 	    }
-	    String mainBuffer = "";
-	    if(line != null)
+	String mainBuffer = "";
+	if(line != null)
     	    line = line.trim();
-	    else
+	else
 	    {
         	printError("Format of .xsd file is not valid. Tag <schema> "
-				   + "is expected.");
-		    return;
-		}
-		try
-		{
-    	    while(line != null)
-	        {
-        	    outLine.write(line, 0, line.length());
+			   + "is expected.");
+		return;
+	    }
+	try
+	    {
+		while(line != null)
+		    {
+			outLine.write(line, 0, line.length());
 		        mainBuffer = mainBuffer + line;
 		        outLine.write("\n");
-        	    line = inLine.readLine();
-	        }
+			line = inLine.readLine();
+		    }
 	        outLine.close();
-    	    inLine.close();
+		inLine.close();
 	        FileInputStream is = new FileInputStream("oracletemp.txt");
-            //Verify the format of schema file.
+		//Verify the format of schema file.
         	SAXParser parser = new SAXParser();
 	        parser.parse(new InputSource(is));
 	        messageJLabel.setText("Schema document validation is successfull.");
@@ -184,44 +185,44 @@ e.getMessage());
 	    }
     	catch(Exception e)
 	    {
-		    printError(""+e);
-		    return;
-        }
+		printError(""+e);
+		return;
+	    }
     	msg = processFile("oracletemp.txt", mainBuffer);
     	if(msg != null)
     	    return;
     }
 
-	private String processFile(String fileName, String mainBuffer)
-	{
-	    BufferedReader inLine = null;
-	    String line = null;
-	    try
-	        {
+    private String processFile(String fileName, String mainBuffer)
+    {
+	BufferedReader inLine = null;
+	String line = null;
+	try
+	    {
 	        inLine = new BufferedReader(new FileReader(fileName));
 	        line = inLine.readLine();
-	        }
-	    catch(Exception e)
-	        {
-	            printError(""+e);
-	            return "error";
-	        }
+	    }
+	catch(Exception e)
+	    {
+		printError(""+e);
+		return "error";
+	    }
     	String mainPath = "";
-	    int level = -1;
+	int level = -1;
     	int index = -1;
-	    int index1 = -1;
+	int index1 = -1;
     	int index2 = -1;
-	    int j = -1;
+	int j = -1;
     	int i = -1;
-	    Vector element = new Vector(10);
+	Vector element = new Vector(10);
     	Hashtable paths = new Hashtable();
     	Hashtable moduleName = new Hashtable();
     	String elementName = null;
     	String typeName = null;
-	    String namespace = null;
+	String namespace = null;
     	while(line != null)
 	    {
-		    index = line.indexOf("element");
+		index = line.indexOf("element");
         	if(index != -1) //element
 		    {
 			j=index+8;
@@ -280,7 +281,7 @@ e.getMessage());
 					ElementInfo e = (ElementInfo) element.get(level);
 					if(index1 != -1)
 					    {
-					    moduleName.put(e, "");
+						moduleName.put(e, "");
 					    }
 					if(namespace != null)
 					    {
@@ -327,7 +328,7 @@ e.getMessage());
 					    }
 				    }
 			    }  //name not found
-			    else if((line.indexOf("element>")) != -1)
+			else if((line.indexOf("element>")) != -1)
 			    {
 				for(i=0; i<=level; i++)
 				    {
@@ -455,32 +456,32 @@ e.getMessage());
 				element.set(i, e);
 			    }
 		    }
-		    try
-		        {
-	            line = inLine.readLine();
+		try
+		    {
+			line = inLine.readLine();
 	            }
 	        catch(Exception ex)
 	            {
-	            printError(""+ex);
-	            return "error";
+			printError(""+ex);
+			return "error";
 	            }
 	    }
-	    String msg = askModuleInfo(moduleName);
-	    if(msg != null)
-	        return "error";
-	    else
-	        return null;
-	}
+	String msg = askModuleInfo(moduleName);
+	if(msg != null)
+	    return "error";
+	else
+	    return null;
+    }
 
-	private void refreshScreen()
-	{
-	    addJTextField1.setText(" ");
-	    messageJLabel.setText(" ");
-	}
+    private void refreshScreen()
+    {
+	addJTextField1.setText(" ");
+	messageJLabel.setText(" ");
+    }
 
-	/**
-  	* This method is used to increase the version value for the tags.
-  	*/
+    /**
+     * This method is used to increase the version value for the tags.
+     */
 
     public String modifyKeyValue(String key, int version)
     {
@@ -493,17 +494,17 @@ e.getMessage());
     }
 
 
-	private String askModuleInfo(Hashtable main)
+    private String askModuleInfo(Hashtable main)
+    {
+	String msg = null;
+	Vector moduleVector = new Vector();
+	ElementInfo element = null;
+	String key = null;
+	String moduleInfo = null;
+	int ind = 0;
+	ElementInfo elementInfo = null;
+	for(Enumeration e = main.keys();e.hasMoreElements();)
 	    {
-	    String msg = null;
-	    Vector moduleVector = new Vector();
-	    ElementInfo element = null;
-	    String key = null;
-	    String moduleInfo = null;
-	    int ind = 0;
-	    ElementInfo elementInfo = null;
-	    for(Enumeration e = main.keys();e.hasMoreElements();)
-	        {
 	        element = (ElementInfo)e.nextElement();
 	        key = element.getKey();
 	        Object getDB = db.get(key);
@@ -512,33 +513,33 @@ e.getMessage());
 		        elementInfo = ElementInfo.getElementInfo((String)getDB);
 		        element.setModuleInfo(elementInfo.getModuleInfo());
 		        int version = elementInfo.getVersion();
-				String newKey = modifyKeyValue(key, version);
-				version++;
-				elementInfo.setVersion(version);
-				db.remove(key);
-				elementInfo.setKey(newKey);
-				db.put(newKey, elementInfo.toString());
+			String newKey = modifyKeyValue(key, version);
+			version++;
+			elementInfo.setVersion(version);
+			db.remove(key);
+			elementInfo.setKey(newKey);
+			db.put(newKey, elementInfo.toString());
 	            }
-	         moduleVector.add(ind, element);
-	         ind++;
-	        }
-	        int row = 0;
-	        for(Enumeration e = moduleVector.elements();e.hasMoreElements();)
-	        {
-	            e.nextElement();
-	            row++;
-	        }
-	        Object[][] moduleArray;
-	        moduleArray = new Object[row][4];
-	        int i =0;
-	        for(Enumeration e = moduleVector.elements();e.hasMoreElements();)
-	        {
-	            moduleArray[i][0] = e.nextElement();
-	            i++;
-	        }
-	        ModuleTable.showTable(moduleArray, row);
-		    return msg;
-       	}
+		moduleVector.add(ind, element);
+		ind++;
+	    }
+	int row = 0;
+	for(Enumeration e = moduleVector.elements();e.hasMoreElements();)
+	    {
+		e.nextElement();
+		row++;
+	    }
+	Object[][] moduleArray;
+	moduleArray = new Object[row][4];
+	int i =0;
+	for(Enumeration e = moduleVector.elements();e.hasMoreElements();)
+	    {
+		moduleArray[i][0] = e.nextElement();
+		i++;
+	    }
+	ModuleTable.showTable(moduleArray, row);
+	return msg;
+    }
 
     public static void addToDB(Object[][] moduleInfo, int row)
     {
@@ -546,85 +547,101 @@ e.getMessage());
         String key = null;
         String msg = null;
         for(int i=0; i<row; i++)
-        {
-            element = (ElementInfo)moduleInfo[i][0];
-            key = element.getKey();
-            element.setModuleInfo(moduleInfo[i][1].toString());
-            msg = db.put(key, element.toString());
+	    {
+		element = (ElementInfo)moduleInfo[i][0];
+		key = element.getKey();
+		element.setModuleInfo(moduleInfo[i][1].toString());
+		msg = db.put(key, element.toString());
 	        if(msg != null)
-	        {
-		    printError(msg);
-		    return;
+		    {
+			printError(msg);
+			return;
 		    }
-		}
-		msg = db.shutdown();
-		if(msg != null)
-		{
-		    printError(msg);
-		    return;
-		}
-		messageJLabel.setText("Tags are successfully added");
+	    }
+	msg = db.shutdown();
+	if(msg != null)
+	    {
+		printError(msg);
 		return;
+	    }
+	messageJLabel.setText("Tags are successfully added");
+	return;
     }
 
 
     private String initialize()
-        {
-       	File file = new File("oracle.prop");
-	    Properties property = new Properties();
-	    String msg = null;
-	    try
-	        {
-		    property.load(new FileInputStream(file));
-	        }
-	    catch(FileNotFoundException ffe)
-	        {
-		    printError("Exception: " + ffe);
-		    return "error";
-	        }
-	    catch(IOException ioe)
-	        {
-		    printError("Exception: "+ ioe);
-		    return "error";
-	        }
-	    oraclePath = property.getProperty("oraclePath");
-	    if(oraclePath == null || oraclePath.length() < 1)
+    {
+	String msg = null;
+	//code to read parameters from the property file
+	File file = new File(rootPath + File.separator + "oracle.prop");
+	if(!file.exists())
 	    {
-		    printError("Parameter 'oraclePath' must be set in 'oracle.prop' file.");
-		    return "error";
+		file = new File(rootPath + File.separator + "psl" + File.separator + "oracle" + File.separator + "oracle.prop");
+		if(!file.exists())
+		    {
+			printError("File 'oracle.prop' does not exist");
+			return "error";
+		    }
 	    }
-	    dbName = property.getProperty("dbName");
-	    if(dbName == null || dbName.length() < 1)
-	        {
-		    printError("Parameter 'dbName' must be set in 'oracle.prop' file.");
-		    return "error";
-	        }
-	    moduleDir = property.getProperty("moduleDir");
+	Properties property = new Properties();
+	try
+	    {
+		property.load(new FileInputStream(file));
+	    }
+	catch(FileNotFoundException ffe)
+	    {
+		printError("Exception: " + ffe);
+		return "error";
+	    }
+	catch(IOException ioe)
+	    {
+		printError("Exception: "+ ioe);
+		return "error";
+	    }
+	moduleInfo = property.getProperty("defaultModuleInfo");
+	if(moduleInfo == null || moduleInfo.length() < 1)
+	    {
+		printError("Parameter 'defaultModuleInfo' must be set in 'oracle.prop' file.");
+		return "error";
+	    }
+	defaultModuleInfo = moduleInfo;
+	dbLoc = property.getProperty("dbLocation");
+	if(dbLoc == null || dbLoc.length() < 1)
+	    {
+		printError("Parameter 'dbLocation' must be set in 'oracle.prop' file.");
+		return "error";
+	    }
+	moduleDir = property.getProperty("moduleDir");
         if(moduleDir == null || moduleDir.length() < 1)
-	        {
-		    printError("Parameter 'moduleDir' must be set in 'oracle.prop' file.");
-		    return "error";
-	        }
-	    moduleDir = oraclePath + File.separator + moduleDir;
-	    db = null;
-	    try
-	        {
-		    db = new DBInterfaceFrame(dbName);
-	        }
-	    catch(Exception e)
-	        {
-		    printError("Exception in database: " + e);
-		    msg = db.shutdown();
-		    return "error";
-	        }
-	    return null;
-	   	}
+	    {
+		printError("Parameter 'moduleDir' must be set in 'oracle.prop' file.");
+		return "error";
+	    }
 
-	   	static void printError(String msg)
-	   	{
-	   	    ErrorJDialog ed = new ErrorJDialog();
-	        ed.setMessage(msg);
-	   	}
+	//property file code end here
+	try
+	    {
+		//dbName = dbLoc + File.separator + dbName;
+		db = new DBInterfaceFrame(dbName);
+	    }
+	catch(Exception e)
+	    {
+		printError("Exception in database: " + e);
+		msg = db.shutdown();
+		return "error";
+	    }
+	return null;
+    }
 
+    public static void printError(String msg)
+    {
+	ErrorJDialog ed = new ErrorJDialog();
+	ed.setMessage(msg);
+    }
+    
 
 }
+
+
+
+
