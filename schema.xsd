@@ -1,20 +1,92 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema>
-  <?FleXML type="schemaFrag" name="sendmail/biff" version="1.0"?>
-    <annotation>
-      <documentation>
-        Schema fragment for data from sendmail/biff probes.	Copyright 2000 Trustees of Columbia University	in the City of New York.  All rights reserved.      </documentation>
-    </annotation>
-   <element name="smtp">
-    <complexType>
-      <sequence>
-        <element name="to" type="string"/>
-        <element name="from" type="string"/>
-        <element name="subject" type="string"/>
-        <element name="sent" type="timeInstant"/>
-        <element name="received" type="timeInstant" minOccurs="0"/>
-      </sequence>
-    </complexType>
-  </element>
+<xsd:schema 
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+	xmlns:se="http://www.psl.cs.columbia.edu/2001/01/SE01"
+	elementFormDefault="qualified">
+  <?FleXML type="schemaFrag" name="activeInterface" version="1.0"?>
+    <xsd:annotation>
+      <xsd:documentation>
+        Schema fragment for data from Active Interface.
+	Copyright 2001 Trustees of Columbia University
+	in the City of New York.  All rights reserved.
+      </xsd:documentation>
+    </xsd:annotation>
+ 
+  <xsd:element name="event">
+    <xsd:complexType>
+      <xsd:sequence>
+
+	<xsd:element name="packager">
+	  <xsd:complexType>
+	    <xsd:attribute name="type" type="xsd:string"/>
+	  </xsd:complexType>
+	</xsd:element>
+	<xsd:element name="timestamp">
+	  <xsd:complexType>
+	    <xsd:attribute name="type" type="xsd:string"/>
+	  </xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="parameters">
+	  <xsd:complexType>
+	    <xsd:sequence>
+
+	      <xsd:element name="callback">
+		<xsd:complexType>
+		  <xsd:attribute name="type" type="xsd:string"/>
+		</xsd:complexType>
+	      </xsd:element>
+	      <xsd:element name="object">
+		<xsd:complexType>
+		  <xsd:attribute name="value" type="xsd:string"/>
+		</xsd:complexType>
+	      </xsd:element>
+	      <xsd:element name="class">
+		<xsd:complexType>
+		  <xsd:attribute name="name" type="xsd:string"/>
+		</xsd:complexType>
+	      </xsd:element>
+	      <xsd:element name="method">
+		<xsd:complexType>
+		  <xsd:attribute name="name" type="xsd:string"/>
+		</xsd:complexType>
+	      </xsd:element>
+	      <xsd:element name="parameters">
+		<xsd:complexType>
+		  <xsd:sequence>
+
+		    <xsd:element name="param" minOccurs="0" maxOccurs="unbounded">
+		      <xsd:complexType>
+			<xsd:attribute name="type" type="xsd:string"/>
+			<xsd:attribute name="value" type="xsd:string"/>
+		      </xsd:complexType>
+		    </xsd:element>
+
+		    <xsd:element name="SERVICE_DYNAMICS">
+		      <xsd:complexType>
+			<xsd:sequence>
+
+			  <xsd:element name="Service" type="xsd:string"/> 
+			  <xsd:element name="State" type="xsd:string"/> 
+			  <xsd:element name="Exception_msg" type="xsd:string" minOccurs="0"/> 
+			  <xsd:element name="Status_title" type="xsd:string" minOccurs="0"/> 
+			  <xsd:element name="Status_message" type="xsd:string" minOccurs="0"/> 
+			  <xsd:element name="Progress" type="xsd:string" minOccurs="0"/> 
+
+			</xsd:sequence>
+		      </xsd:complexType>
+		    </xsd:element>
+
+		  </xsd:sequence>
+		</xsd:complexType>
+	      </xsd:element>
+
+	    </xsd:sequence>
+	  </xsd:complexType>
+	</xsd:element>
+
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
   <?FleXML type="/schemaFrag"?>
-</schema>
+</xsd:schema>
