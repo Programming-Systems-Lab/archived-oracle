@@ -72,7 +72,7 @@ public class SchemaFragment
 
 
 
-    public Vector getMoudleName()
+    public Vector getModuleName()
     {
     	return moduleName;
     }
