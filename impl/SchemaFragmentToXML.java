@@ -31,7 +31,7 @@ public class SchemaFragmentToXML
   public String toXML(SchemaFragment sf)
   {
     String xmlForm = null;
-    String initBuffer = "<?xml version=\"1.0\" <FleXML:schemaFrag version=\"1.0\" name=\"";
+    String initBuffer = "<schemaFrag version=\"1.0\" name=\"";
     String name = sf.getName();
     String fragment = sf.getDescription();
     String moduleName = sf.getModuleName();
@@ -41,16 +41,16 @@ public class SchemaFragmentToXML
     if(moduleName.length() > 0)
     {
       buffer = name + "\"> <schema>" + fragment + "</schema> <module type=\"java1.3\""
-                    + " persistent=\"" + persistent + "\" instance"
+                    + " cacheable=\"" + persistent + "\" instance"
                     + "=\"" + instanceName + "\">" + moduleName + "</module> "
-                    + "</FleXML:schemaFrag>";
+                    + "</schemaFrag>";
     }
     else
     {
       buffer = name + "\"> <schema>" + fragment + "</schema> <module type=\"\""
-                    + " persistent=\"\" instance"
+                    + " cacheable=\"\" instance"
                     + "=\"" + instanceName + "\">" + moduleName + "</module> "
-                    + "</FleXML:schemaFrag>";
+                    + "</schemaFrag>";
     }
     xmlForm = initBuffer.concat(buffer);
     return xmlForm;

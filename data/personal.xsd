@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema>
 
+<element name="person"/>
  <element name="personnel">
   <type>
    <element ref="person" minOccurs='1' maxOccurs='*'/>
@@ -8,7 +9,7 @@
   </type>
  </element>
 
- <element name="person">
+ <xsd:element name="person">
   <type>
    <element ref="name"/>
    <element ref="email" minOccurs='0' maxOccurs='*'/>
@@ -25,7 +26,7 @@
    </attribute>
    <attribute name="salary" type="integer"/>
   </type>
- </element>
+ </xsd:element>
 
  <element name="name">
   <type content='elementOnly'>

@@ -55,7 +55,7 @@ public class XMLToQuery
       return null;
     else
     {
-      String namespace = name.substring(index1+7, index3);
+      String namespace = name.substring(0, index3);
       return namespace;
     }
   }
@@ -84,7 +84,7 @@ public class XMLToQuery
     }
     else
     {
-      name = name.substring(index3+1, temp.length());
+      name = temp.substring(index3+1, temp.length());
     }
     return name;
   }
