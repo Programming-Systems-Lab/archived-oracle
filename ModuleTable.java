@@ -238,6 +238,6 @@ class ModuleTableFrame extends JFrame
 	        }
 	    }
 	    setVisible(false);
-        AddFrame.addToDB(moduleInfo, totalRow);
+        AddJFrame.addToDB(moduleInfo, totalRow);
 	}
 }

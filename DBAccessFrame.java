@@ -79,8 +79,8 @@ public class DBAccessFrame extends JApplet
 	void addJButton_mouseClicked_Interaction1(java.awt.event.MouseEvent event)
 	{
 		try {
-			// AddFrame Create and show the AddFrame
-			(new AddFrame()).setVisible(true);
+			// AddJFrame Create and show the AddJFrame
+			(new AddJFrame()).setVisible(true);
 		} catch (java.lang.Exception e) {
 		}
 	}
@@ -94,7 +94,7 @@ public class DBAccessFrame extends JApplet
 	{
 		try {
 			// DeleteJFrame Create and show the DeleteJFrame
-			(new DeleteFrame()).setVisible(true);
+			(new DeleteJFrame()).setVisible(true);
 		} catch (java.lang.Exception e) {
 		}
 	}
