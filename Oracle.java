@@ -31,35 +31,37 @@ public class Oracle implements IOracle
 
     public Oracle()
     {
-        File file = new File("oracle.prop");
-	    Properties property = new Properties();
-	    try
-	    {
-	        property.load(new FileInputStream(file));
-	    }
-	    catch(FileNotFoundException ffe)
-	    {
-	        System.err.println("Exception: " + ffe);
-	        System.exit(0);
-	    }
-	    catch(IOException ioe)
-	    {
-	        System.err.println("Exception: "+ ioe);
+	File file = new File("oracle.prop");
+	Properties property = new Properties();
+	try
+	{
+	    property.load(new FileInputStream(file));
+	}
+	catch(FileNotFoundException ffe)
+	{
+	    System.err.println("Exception: " + ffe);
+	    System.exit(0);
+	}
+	catch(IOException ioe)
+	{
+	    System.err.println("Exception: "+ ioe);
             System.exit(1);
         }
-	    dbName = property.getProperty("dbName");
-	    if(dbName == null || dbName.length() < 1)
-	    {
-	        System.err.println("Parameter 'sienaPort' must be set in 'oracle.prop' file.");
-	        System.exit(0);
-	    }
-	    moduleDir = property.getProperty("moduleDir");
-	    if(moduleDir == null || moduleDir.length() < 1)
-	    {
-	        printLog("Parameter 'moduleDir' must be set in 'oracle.prop' file.");
-	        System.exit(0);
-	    }
+	dbName = property.getProperty("dbName");
+	if(dbName == null || dbName.length() < 1)
+	{
+	    System.err.println("Parameter 'sienaPort' must be set in 'oracle.prop' file.");
+	    System.exit(0);
+        }
+	moduleDir = property.getProperty("moduleDir");
+	if(moduleDir == null || moduleDir.length() < 1)
+	{
+	    printLog("Parameter 'moduleDir' must be set in 'oracle.prop' file.");
+	    System.exit(0);
+	}
     }
+
+
   /**
    * This method is used to get a partial match of the
    * the specified path of an element.
@@ -105,12 +107,9 @@ public class Oracle implements IOracle
     ElementInfo elementInfo = null;
     XMLToQuery xtq = new XMLToQuery(queryXML);
     String namespace = xtq.getNamespace();
-    //printLog("namespace "+namespace);
     String name = xtq.getName();
-    //printLog("name "+name);
     String path = null;
     path = xtq.getPath();
-    //printLog("path "+path);
     SchemaFragment fragment = new SchemaFragment();
     try
     {
@@ -121,7 +120,7 @@ public class Oracle implements IOracle
         System.err.println("Error while intializing the database: "+ e);
         System.exit(1);
     }
-      //Initialize database
+   
     String nsName = null;
     if(namespace != null)
     {
@@ -155,7 +154,6 @@ public class Oracle implements IOracle
          }
      }
      elementInfo = ElementInfo.getElementInfo((String)data);
-     //System.out.println(elementInfo.getPath());
      String schema = elementInfo.getFragment();
      String moduleInfo = elementInfo.getModuleInfo();
      String className = null;
@@ -182,64 +180,65 @@ public class Oracle implements IOracle
       }
 
       // try to get the class for this className
-        fileName = moduleDir + File.separator + className;
-        classFile = new File(fileName);
-        classExists = classFile.exists();
-        if(classExists == false)
-        {
-           throw new InvalidSchemaFormatException("There is no class named "+ className
-                                                   + " for the XMLModule for the tag "
-                                                   + name);
-        }
-        isPersistent = false;
-        try
-        {
-          // get if this is persistent or not
-          isPersistent = Boolean.valueOf(tk.nextToken()).booleanValue();
-        }
-        catch (Exception e)
-        {
-          throw new InvalidSchemaFormatException("This schema definition for tag "
-	            	                         + name + " is incorrectly formatted."
-                                             +"The line for this tag is: "
-                                             + moduleInfo + ", and the error was "
-						                     + e);
-        }
-        instanceName = " ";
-        if (isPersistent == true)
-        {
-          try
-	      {
-            instanceName = tk.nextToken();
-	      }
-	      catch (Exception e)
-	      {
-            throw new InvalidSchemaFormatException("The schema definition for "
-	      			                        + "the tag " + name
-                                            + "is incorrectly formatted. "
-                           					+ "The line for this tag is: "
-					            	        + moduleInfo + ", and the error"
-                                            +" was "+ e);
-          }
 
-        }
-        fragment.setModuleName(className);
-        fragment.setIsPersistent(isPersistent);
-        fragment.setInstanceName(instanceName);
-      }
-      else
+      classFile = new File(className);
+      classExists = classFile.exists();
+      if(classExists == false)
       {
-        fragment.setModuleName("");
-        fragment.setIsPersistent(false);
-        fragment.setInstanceName("");
+         throw new InvalidSchemaFormatException("There is no class named "+ className
+                                                 + " for the XMLModule for the tag "
+                                                 + name);
       }
+      isPersistent = false;
+      try
+      {
+        // get if this is persistent or not
+        isPersistent = Boolean.valueOf(tk.nextToken()).booleanValue();
+      }
+      catch (Exception e)
+      {
+        throw new InvalidSchemaFormatException("This schema definition for tag " 
+	            	                       + name + " is incorrectly formatted."
+                                               +"The line for this tag is: "
+                                               + moduleInfo + ", and the error was "
+						                     + e);
+      }
+      instanceName = " ";
+      if (isPersistent == true)
+      {
+        try
+	{
+            instanceName = tk.nextToken();
+	}
+	catch (Exception e)
+	{
+            throw new InvalidSchemaFormatException("The schema definition for "
+             			                   + "the tag " + name
+                                                   + "is incorrectly formatted. "
+                           			   + "The line for this tag is: "
+					           + moduleInfo + ", and the error"
+                                                   +" was "+ e);
+        }
 
-     if (namespace != null)
+      }
+      className = className.substring(className.lastIndexOf(File.separator)+1, className.length());
+      fragment.setModuleName(className);
+      fragment.setIsPersistent(isPersistent);
+      fragment.setInstanceName(instanceName);
+    }
+    else
+    {
+      fragment.setModuleName("");
+      fragment.setIsPersistent(false);
+      fragment.setInstanceName("");
+    }
+
+    if (namespace != null)
          name = namespace + ":" + name;
-     fragment.setName(name);
-     fragment.setDescription(schema);
-     db.shutdown();
-     return fragment;
+    fragment.setName(name);
+    fragment.setDescription(schema);
+    db.shutdown();
+    return fragment;
   }
 
 
@@ -259,24 +258,24 @@ public class Oracle implements IOracle
     {
       try
       {
-	    String file = args[0];
+	String file = args[0];
         File fileName = new File(file);
         BufferedReader br = new BufferedReader(new FileReader(fileName));
         String name = br.readLine() ;
-	    Oracle oracle = new Oracle();
+	Oracle oracle = new Oracle();
         SchemaFragment fragment = oracle.getFragment(name);
         SchemaFragmentToXML sfx = new SchemaFragmentToXML();
-	   System.out.println(sfx.toXML(fragment));
+	System.out.println(sfx.toXML(fragment));
       }
       catch (UnknownTagException ex)
       {
         db.shutdown();
-	    System.exit(1);
+	System.exit(1);
       }
       catch (InvalidQueryFormatException e)
       {
         db.shutdown();
-	    System.exit(2);
+	System.exit(2);
       }
       catch (InvalidSchemaFormatException e)
       {

@@ -40,6 +40,7 @@ public class ElementInfo
   * This method must be used to store the elements of this class
   * in the database and it must be compatible with the method used to
   * retrieve an object from the database.
+  * This representation will be replaced by standard XML representation.
   */
 
   public String toString()
@@ -114,3 +115,8 @@ public class ElementInfo
       this.moduleInfo = description;
   }
 }
+
+
+
+
+

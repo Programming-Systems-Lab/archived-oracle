@@ -56,3 +56,4 @@ public class SchemaFragmentToXML
     return xmlForm;
   }
 }
+

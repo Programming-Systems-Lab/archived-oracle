@@ -23,10 +23,10 @@ import psl.kx.*;
 
 public class OracleSienaInterface implements Runnable, Notifiable
 {
-    static Siena si = null;
-    static String hostname = null;
-    static String sienaPort = null;
-    PrintWriter log = null;
+        static Siena si = null;
+        static String hostname = null;
+        static String sienaPort = null;
+        PrintWriter log = null;
 
 	/**
 	* Constructor. Set the specified Siena object as the default.
@@ -56,32 +56,32 @@ public class OracleSienaInterface implements Runnable, Notifiable
 	    catch(IOException ioe)
 	    {
 	        printLog("Exception: "+ ioe);
-            System.exit(1);
-        }
+                System.exit(1);
+            }
 	    sienaPort = property.getProperty("sienaPort");
 	    if(sienaPort == null || sienaPort.length() < 1)
 	    {
 	        printLog("Parameter 'sienaPort' must be set in 'oracle.prop' file.");
 	        System.exit(0);
 	    }
-		String master = "senp://localhost:4321";
-		HierarchicalDispatcher hd = new HierarchicalDispatcher();
-		try
-		{
-			hd.setMaster(master);
-			System.out.println("Oracle master is " + master);
-		}
-		catch(siena.InvalidSenderException e)
-		{
-			e.printStackTrace();
-		}
-		catch(IOException ex)
-		{
-			ex.printStackTrace();
-		}
-		OracleSienaInterface osi = new OracleSienaInterface(hd);
-		Thread t = new Thread(osi);
-		t.start();
+	    String master = "senp://localhost:4321";
+	    HierarchicalDispatcher hd = new HierarchicalDispatcher();
+	    try
+	    {
+	      	hd.setMaster(master);
+	       	System.out.println("Oracle master is " + master);
+	    }
+	    catch(siena.InvalidSenderException e)
+	    {
+	       	e.printStackTrace();
+	    }
+	    catch(IOException ex)
+	    {
+	       	ex.printStackTrace();
+	    }
+	    OracleSienaInterface osi = new OracleSienaInterface(hd);
+	    Thread t = new Thread(osi);
+	    t.start();
 	}
 
 
@@ -105,46 +105,46 @@ public class OracleSienaInterface implements Runnable, Notifiable
 	        System.exit(0);
 	    }
 	    InetAddress addr = null;
-		try
-      	{
+	    try
+	    {
   	      	addr = InetAddress.getLocalHost();
-		}
-		catch(Exception e)
-		{
-            	System.err.println("Exception occurred: " + e);
-		}
+	    }
+	    catch(Exception e)
+	    {
+           	System.err.println("Exception occurred: " + e);
+	    }
             hostname = addr.getHostName();
-		SendWorklet sw = new SendWorklet(hostname, "OracleRegistry");
- 		String master = "senp://localhost:" + sienaPort ;
-		if (args.length > 1)
-		{
-			master = "senp://" + args[1] + ":" + sienaPort;
-		}
-		final HierarchicalDispatcher hd = new HierarchicalDispatcher();
-		try
-		{
-			hd.setMaster(master);
-			System.out.println("Oracle master is " + master);
-		}
-		catch(siena.InvalidSenderException e)
-		{
-			e.printStackTrace();
-		}
-		catch(IOException ex)
-		{
-			ex.printStackTrace();
-		}
-		OracleSienaInterface osi = new OracleSienaInterface(hd);
-		Thread t = new Thread(osi);
-		t.start();
-		Runtime.getRuntime().addShutdownHook(new Thread()
-		{
-			public void run()
-			{
-				 System.out.println("Unsubscribing Siena..");
-				 hd.shutdown();
-			}
-		});;
+	    SendWorklet sw = new SendWorklet(hostname, "OracleRegistry");
+ 	    String master = "senp://localhost:" + sienaPort ;
+	    if (args.length > 1)
+	    {
+	       	master = "senp://" + args[1] + ":" + sienaPort;
+	    }
+	    final HierarchicalDispatcher hd = new HierarchicalDispatcher();
+	    try
+	    {
+	      	hd.setMaster(master);
+	       	System.out.println("Oracle master is " + master);
+	    }
+	    catch(siena.InvalidSenderException e)
+	    {
+	       	e.printStackTrace();
+	    }
+	    catch(IOException ex)
+	     {
+	       	ex.printStackTrace();
+	     }
+	     OracleSienaInterface osi = new OracleSienaInterface(hd);
+	     Thread t = new Thread(osi);
+	     t.start();
+	     Runtime.getRuntime().addShutdownHook(new Thread()
+	     {
+	       	public void run()
+	      	{
+	      		 System.out.println("Unsubscribing Siena..");
+	       		 hd.shutdown();
+	       	}
+	     });;
 	}
 
 
@@ -186,7 +186,7 @@ public class OracleSienaInterface implements Runnable, Notifiable
 		int srcID = this.hashCode();
 	  	publishEvent.put("MPRequestID", MPRequestID);
 		publishEvent.put("MPHostname", MPHost);
-		//publishEvent.put("Type", "OracleQueryResult");
+		
 		try
 		{
 			fragment = oracle.getFragment(query);
@@ -209,10 +209,10 @@ public class OracleSienaInterface implements Runnable, Notifiable
 		}
 		if(msg == null) //no exception occurred while retrieving a fragment
 		{
-			result = true;
+		      result = true;
     		      moduleName = fragment.getModuleName();
-			SchemaFragmentToXML sfx = new SchemaFragmentToXML();
-            	msg = sfx.toXML(fragment);
+		      SchemaFragmentToXML sfx = new SchemaFragmentToXML();
+		      msg = sfx.toXML(fragment);
 		}
 		publishEvent.put("Value", msg);
 
@@ -231,7 +231,7 @@ public class OracleSienaInterface implements Runnable, Notifiable
 		}
 		if(moduleName.length() > 0)
 		{
-			SendOracleReply sor = new SendOracleReply();
+		      SendOracleReply sor = new SendOracleReply();
 		      sor.sendReply(MPRequestID, MPHost, MPRequestID, moduleName);
 		}
 
@@ -308,3 +308,6 @@ public class OracleSienaInterface implements Runnable, Notifiable
 	}
 
 }
+
+
+

@@ -10,7 +10,7 @@
  * @version 1.0
  */
 
- package psl.oracle;
+package psl.oracle;
 
 import java.util.*;
 import java.io.*;
@@ -44,9 +44,7 @@ public class DBInterface
       }
       catch(SQLException ex)//Throw an exception if table already exists
       {
-		ex.printStackTrace();	
       }
-
       catch(Exception e)
       {
         	e.printStackTrace();
@@ -61,11 +59,11 @@ public class DBInterface
    */
  public synchronized void shutdown()
  {
-	try
+      try
       {
-	    /* Close the db and terminate the session */
+	/* Close the db and terminate the session */
         conn.close();
-  	  }
+      }
       catch(Exception e)
       {
           e.printStackTrace();
