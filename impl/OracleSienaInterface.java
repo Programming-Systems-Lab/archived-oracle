@@ -44,8 +44,6 @@
 
                 static String hostname = null;
 
-                static WVM wvm = null;
-
 		/**
 
 		* Constructor. Set the specified Siena object as the default.
@@ -88,7 +86,7 @@
 
 			}
 
-			catch(siena.InvalidHandlerException e)
+			catch(siena.InvalidSenderException e)
 
 			{
 
@@ -142,8 +140,7 @@
 		        }
         		hostname = addr.toString();
                         hostname = hostname.substring(hostname.indexOf('/')+1, hostname.length());
-                        SendWorklet sw = new SendWorklet();
-                        wvm = new WVM(sw, hostname, "OracleRegistry");
+                        SendWorklet sw = new SendWorklet(hostname, "OracleRegistry");
  			String master = "senp://localhost:31337";
 
 			if (args.length > 0)
@@ -166,7 +163,7 @@
 
 			}
 
-			catch(siena.InvalidHandlerException e)
+			catch(siena.InvalidSenderException e)
 
 			{
 
@@ -263,8 +260,9 @@ public void processMPQuery(String query, String MPHost, int MPSourceID, String M
 	n.putAttribute("hostname", hostname);
 
 	n.putAttribute("source", "psl.oracle.impl.OracleSienaInterface");
+	int responseID = this.hashCode();
 
-	n.putAttribute("ResponseID", this.hashCode());
+	n.putAttribute("ResponseID", responseID);
  	n.putAttribute("MPSrcID", MPSourceID);
   	n.putAttribute("MPRequestID", MPRequestID);
 
@@ -345,7 +343,7 @@ public void processMPQuery(String query, String MPHost, int MPSourceID, String M
 	if(moduleName.length() > 0)
 	{
 		SendOracleReply sor = new SendOracleReply();
-	        sor.sendReply(wvm, MPHost, moduleName);
+	        sor.sendReply( responseID, MPHost, moduleName);
 	}
 
 }

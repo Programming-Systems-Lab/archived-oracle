@@ -16,23 +16,28 @@ public class SendWorklet {
     TestOrcl to = new TestOrcl(args[0], args[1], args[2], args[3]);
     System.exit(0);
   }*/
+    static WVM wvm;
 
-  public SendWorklet ()
+  public SendWorklet (String host, String name)
   {
+      wvm = new WVM(this, host, name);
   }
-  public SendWorklet(WVM wvm, String rHost, String rName, String moduleName) {
+  public static void send(int key, String rHost, String rName, String moduleName) {
     //WVM wvm = new WVM(this, host, name);
     {
+      System.out.println(key);
+      System.out.println(rHost);
+      System.out.println(rName);
+      System.out.println(moduleName);
       // this code block creates the Vector of classfile locations to send out
       Worklet wkl = new Worklet(null);
 
       Vector v = new Vector();
      // v.add("./Oracle.class");
       v.add(moduleName);
-      System.out.println(moduleName);
       //v.add(moduleName);
       System.out.println("Creating CFRWJ");
-      CFRWJ wj = new CFRWJ(v, rHost, rName);
+      CFRWJ wj = new CFRWJ(key, v, rHost, rName);
 
       System.out.println("Adding CFRWJ to WKL");
       wkl.addJunction(wj);
