@@ -22,7 +22,7 @@ import java.io.*;
  */
 
 public interface IOracle {
-       public SchemaFragment getFragment(String rootName) throws UnknownTagException,
+       public SchemaFragment getFragment(String rootName, String source) throws UnknownTagException,
                                                           InvalidQueryFormatException,
 									    InvalidSchemaFormatException;
   }

@@ -145,7 +145,7 @@ public class OracleService implements GroupspaceService,
 				msg = "Receiving an event from Metaparser: " + query;
 				GroupspaceEvent geMsg = new GroupspaceEvent(msg, "OracleEventMessage", null, msg, true);
 				gc.groupspaceEvent(geMsg);
-				fragment = oracle.getFragment(query);
+				fragment = oracle.getFragment(query, null);
 			  }
 			catch (UnknownTagException ex)
                  	  {

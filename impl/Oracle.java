@@ -22,13 +22,14 @@ import psl.oracle.exceptions.*;
 
 import java.io.*;
 import java.util.*;
-
+import java.net.*;
 
 
 public class Oracle implements IOracle
 {
    //Intializes database interface
 
+    Hashtable oracleQuery = new Hashtable();
     static DBInterface db = null;
     String dbName =  "oracleDB";
     public Oracle()
@@ -52,6 +53,12 @@ public static String getPartialMatch(String name)
     }
 }
 
+public void processOracleReply(String query, String reply)
+{
+  oracleQuery.put(query, reply);
+}
+
+
   /** This method gets a schema fragment for a given element.
    * All persistent objects must have an instance name associated with
    * them so that the XML MetaParser can store this XML Module
@@ -65,15 +72,15 @@ public static String getPartialMatch(String name)
    * is not proper.
    */
 
-public synchronized SchemaFragment getFragment(String query)
+public synchronized SchemaFragment getFragment(String query, String source)
                                         throws UnknownTagException,
                                         InvalidQueryFormatException,
                                         InvalidSchemaFormatException
 {
-	ElementInfo elementInfo = null;
+    ElementInfo elementInfo = null;
     int index = query.indexOf(',');
-	int index1 = query.indexOf(':');
-	int index2 = query.indexOf(',', index+1);
+    int index1 = query.indexOf(':');
+    int index2 = query.indexOf(',', index+1);
 	int index3 = query.indexOf('=', index+1);
 	String srcId = null;
 	String nameSpace = null;
@@ -159,7 +166,6 @@ public synchronized SchemaFragment getFragment(String query)
 	}
 
     name = name.trim();
-
       //Initialize database
 
 	 String nsName = null;
@@ -202,6 +208,26 @@ public synchronized SchemaFragment getFragment(String query)
                 if(data != null)
                     break;
                 modifiedPath = getPartialMatch(modifiedPath);
+            }
+            if(data == null && source != "oracleQuery")//ask other Oracles
+            {
+              InetAddress addr = null;
+ 	      try
+	      {
+                addr = InetAddress.getLocalHost();
+	      }
+              catch(Exception e)
+	      {
+	        System.out.println("Exception occurred: " + e);
+	      }
+             oracleQuery.put(query, "");
+	      String hostName = addr.toString();
+              String instanceName = null;
+		OracleSienaInterface ors = new OracleSienaInterface();
+             ors.generateOracleEvent(query);
+              data = (Object)oracleQuery.get(query);
+		  if (data == "")
+			data = null;
             }
             if(data == null)
                 throw new UnknownTagException("There is no schema entry for the "
@@ -313,7 +339,7 @@ public static void main(String args[])
 	    {
 			String name = args[0];
 			Oracle oracle = new Oracle();
-			System.out.println(oracle.getFragment(name).toString());
+			System.out.println(oracle.getFragment(name, null).toString());
 	    }
 		catch (UnknownTagException ex)
 	    {

@@ -31,8 +31,8 @@ import psl.oracle.exceptions.*;
 
 public class SchemaInterface
 {
-    String[] moduleInfo = {"default,false,null","default,false,null","default,false,null"};
-    String defaultModuleInfo = "default,false,null";
+    String[] moduleInfo = {"psl/oracle/impl/default.class,false,null","psl/oracle/impl/default.class,false,null","psl/oracle/impl/default.class,false,null"};
+    String defaultModuleInfo = "psl/oracle/impl/default.class,false,null";
     static DBInterface db = null;
     String dbName = "oracleDB";
     public SchemaInterface()
@@ -59,10 +59,10 @@ public class SchemaInterface
 protected String[] askModuleInfo(String name)
 {
     String line = null;
-    String moduleName = "psl/oracle/impl/default";
+    String moduleName = "psl/oracle/impl/default.class";
     String isPersistent = "false";
     String instanceName = "null";
-    while(true)
+     while(true)
     {
         line = getString();
         line = line.trim();
@@ -85,7 +85,7 @@ protected String[] askModuleInfo(String name)
             {
                 moduleName = st.nextToken();
                 actualElements++;
-                /*Class moduleClass = null;
+                Class moduleClass = null;
                 try
                 {
                     moduleClass = Class.forName(moduleName);
@@ -94,9 +94,9 @@ protected String[] askModuleInfo(String name)
                 {
                     System.out.println("No class exists with the name: " + moduleName
                                         +" Please enter again.");
-                    moduleName ="default";
+                    moduleName ="psl/oracle/impl/default.class";
                     break;
-                }*/
+                }
                 if(st.hasMoreElements())
                 {
                     isPersistent = st.nextToken();
@@ -190,7 +190,7 @@ protected void addFragments() throws IOException,
                                   FileNotFoundException
 {
     System.out.println("Enter the name of a Schema document(.xsd format)");
-    String[] moduleInfo = {"default,false,default", "default,false,default", "default,false,default"};
+    String[] moduleInfo = {"psl/oracle/impl/default.class,false,default", "psl/oracle/impl/default.class,false,default", "psl/oracle/impl/default.class,false,default"};
 
     //String fileName = getString();
     String fileName = "d:\\kanan\\research\\psl\\psl\\oracle\\data\\schema1.xsd";
@@ -638,7 +638,7 @@ public void addToDB(ElementInfo element)
                     {
                            schemaInterface1.removeFragment();
                     }
-                    catch(UnknownTagException ex)                            
+                    catch(UnknownTagException ex)
                     {
                     }
                     catch(Exception e)
