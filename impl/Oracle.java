@@ -140,50 +140,53 @@ public class Oracle implements IOracle
      boolean classExists = false;
      boolean isPersistent = false;
      String instanceName = null;
-     StringTokenizer tk = new StringTokenizer(moduleInfo, ", ", false);
-     try
+     System.out.println("info "+ moduleInfo);
+     if(moduleInfo.length() > 0)
      {
+      StringTokenizer tk = new StringTokenizer(moduleInfo, ", ", false);
+      try
+      {
         // get the className
         className = tk.nextToken();
-     }
-     catch (Exception e)
-     {
+      }
+      catch (Exception e)
+      {
         throw new InvalidSchemaFormatException("The database for the Oracle "
                         	                    + "is incorrectly formatted for the "
                                                     + "element " + name + ". The line for"
                                                     + " this tag is: " + moduleInfo + " and"
                                                     + " the error was: " + e);
-     }
+      }
 
       // try to get the class for this className
-      fileName = "psl/oracle/modules/" + className;
-      classFile = new File(fileName);
-      classExists = classFile.exists();
-      if(classExists == false)
-      {
+        fileName = "psl/oracle/modules/" + className;
+        classFile = new File(fileName);
+        classExists = classFile.exists();
+        if(classExists == false)
+        {
            throw new InvalidSchemaFormatException("There is no class named "+ className +
                                                      " for the XMLModule for the tag " +
                                                      name);
-      }
-      isPersistent = false;
-      try
-      {
-        // get if this is persistent or not
-        isPersistent = Boolean.valueOf(tk.nextToken()).booleanValue();
-      }
-      catch (Exception e)
-      {
-        throw new InvalidSchemaFormatException("This schema definition for tag "
+        }
+        isPersistent = false;
+        try
+        {
+          // get if this is persistent or not
+          isPersistent = Boolean.valueOf(tk.nextToken()).booleanValue();
+        }
+        catch (Exception e)
+        {
+          throw new InvalidSchemaFormatException("This schema definition for tag "
 	            	                         + name + " is incorrectly formatted."
                                                  +"The line for this tag is: "
                                                  + moduleInfo + ", and the error was "
 						                             + e);
-      }
-      instanceName = " ";
-      if (isPersistent == true)
-      {
-         try
-	 {
+        }
+        instanceName = " ";
+        if (isPersistent == true)
+        {
+          try
+	  {
             instanceName = tk.nextToken();
 	  }
 	  catch (Exception e)
@@ -196,10 +199,17 @@ public class Oracle implements IOracle
                                                         +" was "+ e);
           }
 
+        }
+        fragment.setModuleName(className);
+        fragment.setIsPersistent(isPersistent);
+        fragment.setInstanceName(instanceName);
       }
-      fragment.setModuleName(className);
-      fragment.setIsPersistent(isPersistent);
-      fragment.setInstanceName(instanceName);
+      else
+      {
+        fragment.setModuleName("");
+        fragment.setIsPersistent(false);
+        fragment.setInstanceName("");
+      }
 
       fragment.setName(name);
       fragment.setDescription(schema);

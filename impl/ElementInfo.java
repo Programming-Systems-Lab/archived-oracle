@@ -108,6 +108,9 @@ public class ElementInfo
   }
   public void setModuleInfo(String description)
   {
-    this.moduleInfo = description;
+    if (description == null)
+      this.moduleInfo = "";
+    else
+      this.moduleInfo = description;
   }
 }

@@ -52,7 +52,8 @@ public class SchemaInterface
 /** Prompts user to add information like module name, if
   * persistent or not and instance name. Instance name is only
   * stored if a module is persistent. A user can press "Enter" to
-  * store a default value for current tag or he can type 'skip' to
+  * store a null value for current tag or he can enter "1" to
+  * store a default value for a module or he can enter "2" to
   * store default values for rest of the tags in the file.
   */
 
@@ -66,63 +67,88 @@ protected String askModuleInfo(String name)
     {
         line = getString();
         line = line.trim();
-        if(line.equals("skip"))
-        {
-            moduleInfo = "skip";
-            return moduleInfo;
-        }
+        //if(line.equals("skip"))
+        //{
+          //  moduleInfo = "skip";
+            //return moduleInfo;
+        //}
         if(line.equals("") == true)
         {
+            moduleInfo = null;
             return moduleInfo;
         }
-        String fileName = null;
-        File classFile = null;
-        boolean classExists = false;
-        StringTokenizer st = new StringTokenizer(line, ",");
-        if(st.hasMoreElements())
+        try
         {
+          int input=Integer.valueOf(line).intValue();
+          if(input < 1 || input > 2)
+          {
+            System.out.println("Valid values are 1 or 2. Please try again!");
+            continue;
+          }
+          else
+          {
+            if(input == 1)
+            {
+              return defaultModuleInfo;
+            }
+            if(input == 2)
+            {
+              moduleInfo = "skip";
+              return moduleInfo;
+            }
+          }
+        }
+        catch(Exception ex)
+        {
+          String fileName = null;
+          File classFile = null;
+          boolean classExists = false;
+          StringTokenizer st = new StringTokenizer(line, ",");
+          if(st.hasMoreElements())
+          {
             moduleName = st.nextToken();
             fileName = "psl/oracle/modules/" + moduleName;
             classFile = new File(fileName);
             classExists = classFile.exists();
             if(classExists == false)
             {
-                 System.out.println("No class exists with the name: " + moduleName
-                                     +" Please enter again.");
-                 moduleName ="default.class";
-                 continue;
+              System.out.println("No class exists with the name: " + moduleName
+                                   +" Please enter again.");
+              moduleName ="default.class";
+              continue;
             }
             if(st.hasMoreElements())
             {
-                isPersistent = st.nextToken();
+              isPersistent = st.nextToken();
             }
             else
             {
-                 System.out.println("Number of parameters is not valid");
-                 continue;
+              System.out.println("Number of parameters is not valid");
+              continue;
             }
             isPersistent = isPersistent.trim();
             if(!(isPersistent.equals("true") || isPersistent.equals("false")))
             {
-                 System.out.println("Value of isPersistent is niether true nor false OR "
-                                     +"you have entered an instance name for a non "
-                                     +"persistent module");
-                 isPersistent = "false";
-                 continue;
+               System.out.println("Value of isPersistent is niether true nor false OR "
+                                   +"you have entered an instance name for a non "
+                                   +"persistent module");
+                isPersistent = "false";
+                continue;
             }
             boolean instance = st.hasMoreElements();
             if(instance && (isPersistent.equals("true")== true))
             {
-                 instanceName = st.nextToken();
+               instanceName = st.nextToken();
             }
             else if(!instance && (isPersistent.equals("true")== true))
             {
-                 System.out.println("Instance name must be present if a module "
-                                     + "is persistent");
-                  continue;
+               System.out.println("Instance name must be present if a module "
+                                   + "is persistent");
+                continue;
             }
             moduleInfo = moduleName+","+isPersistent+","+instanceName;
             return moduleInfo;
+          }
       }
     }
 }
@@ -302,7 +328,9 @@ public void processFile(String fileName)throws IOException,
                         e.setKey("0." + namespace + ":" + elementName);
                         //e = (ElementInfo) element.get(level);
                         if(index1 != -1)
+                        {
                             addToDB(e);
+                        }
                     }
                     if(index1 != -1)
                     {
@@ -335,7 +363,6 @@ public void processFile(String fileName)throws IOException,
                         path = path.concat("/" + elementName);
                     else
                         path = mainPath.concat("/" + elementName);
-                    System.out.println(path +" path for element "+elementName);
                     paths.put(elementName, path);
                     for(i=0; i<=level; i++)
                    {
@@ -467,7 +494,7 @@ public void processFile(String fileName)throws IOException,
             if(e.getKey().indexOf("ype=") != -1) //to avoid  <type> </type> kind of constructs
             {
                 addToDB(e);
-                element.remove(level);
+                  element.remove(level);
                 level --;
             }
         }
@@ -510,6 +537,8 @@ public void addToDB(ElementInfo element)
     String key = element.getKey();
     int index = key.indexOf("0.");
     String displayKey = key.substring(index+2, key.length());
+    if(moduleInfo == null)
+      moduleInfo = "";
     if(db.get(key) != null)
     {
         System.out.println("Object: " + displayKey + " already exists. Enter '0' to skip"
@@ -552,15 +581,15 @@ public void addToDB(ElementInfo element)
     }
     else
     {
-      if(moduleInfo.equals("skip") == false)
+     if(moduleInfo.equals("skip") == false)
       {
         System.out.println("Enter information about an element " + key
                             + " in format: <modulename>, <isPersistent>,"
-                            +"<instancename>. Press an 'Enter' "
-                            + "key for a default value: <default><false>. "
-                            +"To skip all tags enter 'skip'");
+                            +"<instancename>. Press an 'Enter' to store null "
+                            + "value, enter  '1' for default value: <default><false>. "
+                            +"To skip all tags enter '2'");
         moduleInfo = askModuleInfo(key);
-        if(moduleInfo.equals("skip") == false)
+        if((moduleInfo == null) || (moduleInfo.equals("skip") == false))
             element.setModuleInfo(moduleInfo);
         else
             element.setModuleInfo(defaultModuleInfo);
