@@ -57,7 +57,7 @@ public class SchemaInterface
 protected String askModuleInfo(String name)
 {
     String line = null;
-    String moduleName = "default";
+    String moduleName = "psl/oracle/impl/default";
     String isSingleton = "false";
     String instanceName = "default";
     while(true)
@@ -76,7 +76,7 @@ protected String askModuleInfo(String name)
         if(st.hasMoreElements())
             {
                 moduleName = st.nextToken();
-                Class moduleClass = null;
+              Class moduleClass = null;
    	        try
                   {
                      moduleClass = Class.forName(moduleName);
@@ -131,8 +131,7 @@ protected String askModuleInfo(String name)
     {
 	System.out.println("Enter the name of a Schema document(.xsd format)");
 
-//      String fileName = getString();
-	String fileName = "D:\\kanan\\Research\\psl\\psl\\oracle\\data\\tp.txt";
+      String fileName = getString();
 	BufferedReader inLine = new BufferedReader(new FileReader(fileName));
 	BufferedWriter outLine = new BufferedWriter(new FileWriter("oracletemp.txt"));
       String line  = inLine.readLine();
@@ -255,7 +254,7 @@ protected String askModuleInfo(String name)
                             elementInfo.setModuleInfo("default,false,default");
                         else
                             elementInfo.setModuleInfo(moduleInfo);
-				System.out.println("Adding: " + key + " " + elementInfo.toString());
+				System.out.println("Adding: " + key);
                         db.put(key, elementInfo.toString());
                }
           }

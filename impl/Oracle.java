@@ -32,16 +32,8 @@ public class Oracle implements IOracle
     static DBInterface db = null;
     public Oracle()
     {
-      try
-        {
-	    db = new DBInterface();
-	}
-      catch(Exception e)
-	 {
-	    System.out.println("Error while intializing the database: "+ e);
-	    System.exit(1);
-	 }
-   }
+      
+    }
 
 
   /** This method gets a schema fragment for a given element.
@@ -106,6 +98,19 @@ public class Oracle implements IOracle
 		throw new InvalidQueryFormatException("2"+query);
 	}
 
+      //Initialize database
+
+	try
+       {
+	    db = new DBInterface();
+	 }
+      catch(Exception e)
+	 {
+	    System.out.println("Error while intializing the database: "+ e);
+	    System.exit(1);
+	 }
+
+
 	String nsName = nameSpace+":"+name;
       Object data = db.get(nsName);
       if(data == null)
@@ -124,13 +129,13 @@ public class Oracle implements IOracle
         String moduleInfo = elementInfo.getModuleInfo();
 	// parse it into each of its pieces
 	StringTokenizer tk = new StringTokenizer(moduleInfo, ", ", false);
-        String className = null;
+      String className = null;
 
         try
         {
 		// get the className
 		className = tk.nextToken();
-	}
+	  }
         catch (Exception e)
         {
                 throw new InvalidSchemaFormatException("The database for the Oracle "
@@ -141,7 +146,7 @@ public class Oracle implements IOracle
 	}
 
 	// try to get the class for this className
-	Class moduleClass = null;
+	/*Class moduleClass = null;
 	try
 	{
           moduleClass = Class.forName(className);
@@ -151,7 +156,7 @@ public class Oracle implements IOracle
              throw new InvalidSchemaFormatException("There is no class named "+ className +
                                                        " for the XMLModule for the tag " +
                                                        name);
-         }
+         }*/
 
 	boolean isSingleton = false;
 
@@ -194,6 +199,7 @@ public class Oracle implements IOracle
 	fragment.setModuleName(className);
 	fragment.setIsSingleton(isSingleton);
 	fragment.setInstanceName(instanceName);
+	db.shutdown();
 	return fragment;
     }
 
@@ -212,7 +218,6 @@ public static void main(String args[])
 			String name = args[0];
 			Oracle oracle = new Oracle();
 			System.out.println(oracle.getFragment(name).toString());
-			db.shutdown();
 		    }
 		catch (UnknownTagException ex)
 		    {
