@@ -14,6 +14,7 @@ package psl.oracle.impl;
 import java.io.*;
 import java.net.*;
 import java.lang.*;
+import java.util.*;
 
 import siena.*;
 import psl.oracle.exceptions.*;
@@ -23,7 +24,8 @@ import psl.worklets2.worklets.*;
 public class OracleSienaInterface implements Runnable, Notifiable
 {
 	static Siena si = null;
-      static String hostname = null;
+    static String hostname = null;
+    static String sienaPort = null;
 
 	/**
 	* Constructor. Set the specified Siena object as the default.
@@ -39,6 +41,28 @@ public class OracleSienaInterface implements Runnable, Notifiable
 	*/
 	public OracleSienaInterface()
 	{
+	    File file = new File("oracle.prop");
+	    Properties property = new Properties();
+	    try
+	    {
+	        property.load(new FileInputStream(file));
+	    }
+	    catch(FileNotFoundException ffe)
+	    {
+	        System.out.println("Exception: " + ffe);
+	        System.exit(0);
+	    }
+	    catch(IOException ioe)
+	    {
+	        System.out.println("Exception: "+ ioe);
+            System.exit(1);
+        }
+	    sienaPort = property.getProperty("sienaPort");
+	    if(sienaPort == null || sienaPort.length() < 1)
+	    {
+	        System.out.println("Parameter 'sienaPort' must be set in 'oracle.prop' file.");
+	        System.exit(0);
+	    }
 		String master = "senp://localhost:4321";
 		HierarchicalDispatcher hd = new HierarchicalDispatcher();
 		try
@@ -67,7 +91,29 @@ public class OracleSienaInterface implements Runnable, Notifiable
 	*/
 	public static void main(String[] args)
 	{
-	      InetAddress addr = null;
+	    File file = new File("oracle.prop");
+	    Properties property = new Properties();
+	    try
+	    {
+	        property.load(new FileInputStream(file));
+	    }
+	    catch(FileNotFoundException ffe)
+	    {
+	        System.out.println("Exception: " + ffe);
+	        System.exit(0);
+	    }
+	    catch(IOException ioe)
+	    {
+	        System.out.println("Exception: "+ ioe);
+            System.exit(1);
+        }
+	    sienaPort = property.getProperty("sienaPort");
+	    if(sienaPort == null || sienaPort.length() < 1)
+	    {
+	        System.out.println("Parameter 'sienaPort' must be set in 'oracle.prop' file.");
+	        System.exit(0);
+	    }
+	    InetAddress addr = null;
 		try
       	{
   	      	addr = InetAddress.getLocalHost();
@@ -76,11 +122,9 @@ public class OracleSienaInterface implements Runnable, Notifiable
 		{
             	System.out.println("Exception occurred: " + e);
 		}
-        	hostname = addr.getHostName();
-		//hostname = addr.toString();
-		//hostname = hostname.substring(hostname.indexOf('/')+1, hostname.length());
-            SendWorklet sw = new SendWorklet(hostname, "OracleRegistry");
- 		String master = "senp://canal.psl.cs.columbia.edu:4321";
+        hostname = addr.getHostName();
+		SendWorklet sw = new SendWorklet(hostname, "OracleRegistry");
+ 		String master = "senp://localhost:" + sienaPort ;
 		if (args.length > 0)
 		{
 			master = args[0];
@@ -102,14 +146,14 @@ public class OracleSienaInterface implements Runnable, Notifiable
 		OracleSienaInterface osi = new OracleSienaInterface(hd);
 		Thread t = new Thread(osi);
 		t.start();
-		Runtime.getRuntime().addShutdownHook(new Thread() 
-		{ 
-			public void run() 
+		Runtime.getRuntime().addShutdownHook(new Thread()
+		{
+			public void run()
 			{
 				 System.out.println("Unsubscribing Siena..");
 				 hd.shutdown();
 			}
-		});; 
+		});;
 	}
 
 
