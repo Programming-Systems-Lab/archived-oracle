@@ -29,7 +29,7 @@ public class Oracle implements IOracle
 {
    //Intializes database interface
 
-    static HashtableDBInterface db = null;
+    static DBInterface db = null;
     String dbName =  "oracleDB";
     public Oracle()
     {
@@ -84,7 +84,7 @@ public synchronized SchemaFragment getFragment(String query)
 
 	try
      {
-	    db = new HashtableDBInterface(dbName);
+	    db = new DBInterface(dbName);
 	 }
      catch(Exception e)
 	 {

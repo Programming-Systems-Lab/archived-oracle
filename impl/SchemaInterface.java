@@ -33,13 +33,13 @@ public class SchemaInterface
 {
     String[] moduleInfo = {"default,false,null","default,false,null","default,false,null"};
     String defaultModuleInfo = "default,false,null";
-    static HashtableDBInterface db = null;
+    static DBInterface db = null;
     String dbName = "oracleDB";
     public SchemaInterface()
     {
         try
         {
-            db = new HashtableDBInterface(dbName);
+            db = new DBInterface(dbName);
         }
         catch(Exception e)
         {
