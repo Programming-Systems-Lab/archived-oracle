@@ -33,7 +33,7 @@ public class SchemaFragment
 
     public String toString()
     {
-        return name + "\n" + description + "\n" + moduleName + "\n" + isSingleton + "\n" + instanceName;
+        return "\n" + description + "\n" + moduleName + "\n" + isSingleton + "\n" + instanceName;
     }
 
     public String getName()
