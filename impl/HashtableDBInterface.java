@@ -2,69 +2,116 @@ package psl.oracle.impl;
 
 import java.util.*;
 import java.io.*;
+import java.sql.*;
+import org.hsql.*;
 
-public class HashtableDBInterface 
+public class HashtableDBInterface
 {
-    private String TABLENAME;
-    private final String CLASSNAME   = "HashtableDBInterface";
-  
-    /* Name of database */
-    private String dbname;          
     
-    /* The database */
-    private Hashtable h;
-    FileInputStream fis;
-
+    /* Name of database */
+    private String dbname;
+    Connection conn = null;
+    private String tableName = null;
+    
     /**
      * Constructor
-     * 
+     *
      */
-    public HashtableDBInterface(String userTableName) throws Exception 
+    public HashtableDBInterface(String userTableName) 
     {
-      TABLENAME = userTableName;
+      tableName = userTableName;
       dbname = userTableName+".dat";
+      
       try
       {
-        FileInputStream fis = new FileInputStream(dbname);
-        ObjectInputStream ois = new ObjectInputStream(fis);
-        h = (Hashtable)ois.readObject();
-        ois.close();
-        fis.close();
+        Class.forName("org.hsql.jdbcDriver");
+        conn=DriverManager.getConnection("jdbc:HypersonicSQL:dbname","sa","");
+        Statement stat=conn.createStatement();
+        stat.execute("CREATE TABLE " + userTableName + "(key varchar(2000),element varchar(20000))");
       }
-      catch(FileNotFoundException e) { /* Create new hashtable */
-        h = new Hashtable();
+      catch(SQLException ex)//Throw an exception if table already exists 
+      {
       }
-      catch(Exception e) 
-      { /* Something else is wrong */
-          e.printStackTrace();
-      }
-  }    
-   
 
- public synchronized void shutdown() 
+      catch(Exception e)
+      {
+        e.printStackTrace();
+      }
+      
+  }
+
+
+ public synchronized void shutdown()
  {
-	try 
+	try
       {
 	    /* Close the db and terminate the session */
-	    ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(dbname));
-	    oos.writeObject(h);
-	    oos.close();
-	}
-      catch(Exception e) 
+        conn.close();	   
+  	  }
+      catch(Exception e)
       {
-          e.printStackTrace(); 
+          e.printStackTrace();
       }
-  }  
+ }
 
-   public synchronized Object get(Object queryTag) 
-   {
-	return h.get(queryTag);
-   }
-    
-   public synchronized void put(Object key, Object data) 
-   {
-	h.put(key,data);
-    }  
+
+ public synchronized Object get(Object queryTag)
+ {
+    // Create a statement object
+    ResultSet result = null;
+    Object result1 = null;
+    try
+    {
+        Statement stat=conn.createStatement();
+        result =stat.executeQuery("SELECT element FROM " + tableName 
+                            +  " WHERE key = '"+ queryTag +"'");
+        if(result.next()) //if object is found
+            result1 = (Object)result.getString(1);
+        else
+            result1 = null;
+    }
+    catch(SQLException ex)
+    {
+        System.out.println("SQL exception: " + ex);
+    }
+    return result1;
+ }
+
+
+
+ public synchronized void put(Object key, Object data)
+ {
+    try
+    {
+       //use PreparedStatement as data may contain "'"
+       PreparedStatement prep=conn.prepareCall("INSERT INTO " + tableName + " (key,element) VALUES (?,?)");
+       prep.clearParameters();
+       prep.setString(1,key.toString());
+       prep.setString(2,data.toString());
+       prep.execute();
+       prep.close();
+    }
+    catch(SQLException ex)
+    {
+       System.out.println("SQL exception: " + ex);
+    }
+ }
+
+ 
+ public synchronized void remove(Object key)
+ {
+    try
+    {
+        Statement stat=conn.createStatement();
+        ResultSet result=stat.executeQuery("DELETE FROM " + tableName 
+                                            + " WHERE key='"+ key + "'" );
+    }
+    catch(SQLException ex)
+    {
+        System.out.println("SQL exception: " + ex);
+    }
+ }
+ 
 }
 
 

@@ -1,4 +1,3 @@
-
 /*
  * Title: SchemaInterface
  * Description:  Interface for a user to add schema fragments and files
@@ -32,8 +31,8 @@ import psl.oracle.exceptions.*;
 
 public class SchemaInterface
 {
-    String[] moduleInfo = {"default,false,","default,false,","default,false,"};
-    String defaultModuleInfo = "default,false,";
+    String[] moduleInfo = {"default,false,null","default,false,null","default,false,null"};
+    String defaultModuleInfo = "default,false,null";
     static HashtableDBInterface db = null;
     String dbName = "oracleDB";
     public SchemaInterface()
@@ -62,7 +61,7 @@ protected String[] askModuleInfo(String name)
     String line = null;
     String moduleName = "psl/oracle/impl/default";
     String isPersistent = "false";
-    String instanceName = "";
+    String instanceName = "null";
     while(true)
     {
         line = getString();
@@ -135,10 +134,9 @@ protected String[] askModuleInfo(String name)
                 {
                     if(totalElements != actualElements)
                     {
-                        System.out.println(totalElements+" "+actualElements);
                         System.out.println("No Instance name should present if a module "
                                            + "is not persistent");
-                        break;    
+                        break;
                     }
                     else
                     return moduleInfo;;
@@ -155,6 +153,32 @@ protected String[] askModuleInfo(String name)
     }
 }
 
+protected void removeFragment()throws UnknownTagException
+{
+    System.out.println("Enter the key value of a Schema fragment you want to "
+                       + "remove. Format: <namespace>:<tag name> OR <tag "
+                       + "name>,<path>");
+    String name = getString();
+    name = name.trim();
+    String key = "0." + name;
+    Object data = db.get(key);
+    if(data == null)
+    {
+        throw new UnknownTagException("There is no schema entry for the "
+                                     + "tag " + name + " in the Oracle.");
+    }
+    ElementInfo e1 = ElementInfo.getElementInfo((String)data);
+    int version = -1;
+    String newVersion = String.valueOf(version);
+    newVersion = newVersion.trim();
+    int index = key.indexOf('.');
+    String newKey = newVersion + "." + key.substring(index+1, key.length());
+    db.remove(key);
+    e1.setKey(newKey);
+    System.out.println("Deleting " + name);
+    db.put(newKey, e1.toString());
+}
+
 
  /** This method is called when a user wants to add schema
   * fragments to the database. User is promted to enter
@@ -169,7 +193,7 @@ protected void addFragments() throws IOException,
     String[] moduleInfo = {"default,false,default", "default,false,default", "default,false,default"};
 
     //String fileName = getString();
-    String fileName = "d:\\kanan\\research\\psl\\psl\\oracle\\data\\frag2.xsd";
+    String fileName = "d:\\kanan\\research\\psl\\psl\\oracle\\data\\schema1.xsd";
     BufferedReader inLine = new BufferedReader(new FileReader(fileName));
     BufferedWriter outLine = new BufferedWriter(new FileWriter("oracletemp.txt"));
     String line  = inLine.readLine();
@@ -265,7 +289,7 @@ public void processFile(String fileName)throws IOException,
                         index2 = line.indexOf('"', index1+1);
                     else
                     {
-                        index1 = line.indexOf("'"); 
+                        index1 = line.indexOf("'");
                         index2 = line.indexOf("'", index1+1);
                     }
                     elementName = line.substring(index1+1, index2);
@@ -286,7 +310,7 @@ public void processFile(String fileName)throws IOException,
                         String temp = (String)paths.get(elementName);
                         e1.setPath(temp);
                     }
-                    e1.setKey(elementName + "," + e1.getPath());
+                    e1.setKey("0." + elementName + "," + e1.getPath());
                     element.set(level, e1);
                     index1 = line.indexOf("/>");
                     ElementInfo e = (ElementInfo) element.get(level);
@@ -296,13 +320,13 @@ public void processFile(String fileName)throws IOException,
                     }
                     if(namespace != null)
                     {
-                        e.setKey(namespace + ":" + elementName);
+                        e.setKey("0." + namespace + ":" + elementName);
                         //e = (ElementInfo) element.get(level);
                         if(index1 != -1)
                             addToDB(e);
                     }
                     if(index1 != -1)
-                    {   
+                    {
                          element.remove(level);
                          int indexPath = mainPath.indexOf("/" + elementName);
                          mainPath = mainPath.substring(0, indexPath);
@@ -312,15 +336,13 @@ public void processFile(String fileName)throws IOException,
                 else if((line.charAt(j) == 'r') && (line.charAt(j+1) == 'e') &&
                       (line.charAt(j+2) == 'f')) //if element ref found
                 {
-                    index1 = line.indexOf('"');
-                    if(index1 != -1)
-                        index2 = line.indexOf('"', index1+1);
-                    else
-                     {
-                         index1 = line.indexOf("'"); 
-                         index2 = line.indexOf("'", index1+1);
-                     }
-                    elementName = line.substring(index1+1, index2);
+                    index1 = line.indexOf("0.");
+                    index2 = line.indexOf('"', index1+2);
+                    if(index2 == -1)
+                    {
+                         index2 = line.indexOf("'", index1+2);
+                    }
+                    elementName = line.substring(index1+2, index2);
                     int indexPath = mainPath.lastIndexOf('/');
                     String parent =mainPath.substring(indexPath+1, mainPath.length());
                     String path = (String)paths.get(parent);
@@ -349,24 +371,27 @@ public void processFile(String fileName)throws IOException,
                 String key = e.getKey();
                 addToDB(e);
                 index = key.indexOf(':');
+                index1 = key.indexOf("0.");
                 if(index != -1) //namespace is not null
                 {
-                    elementName = key.substring(index+1, key.length());
-                    e.setKey(elementName + "," + e.getPath());
+                    elementName = key.substring(index1+2, key.length());
+                    e.setKey("0." + elementName + "," + e.getPath());
                     addToDB(e);
                 }
                else
                 {
                     index = key.indexOf(',');
-                    elementName = key.substring(0, index);
+                    elementName = key.substring(index1+2, index);
                 }
-                int indexPath = mainPath.indexOf("/" + elementName);
+                int inNamespace = elementName.indexOf(':');
+                String tagName = elementName.substring(inNamespace+1, elementName.length());
+                int indexPath = mainPath.indexOf("/" + tagName);
                 mainPath = mainPath.substring(0, indexPath);
                 element.remove(level);
                 level --;
             }
           } //element found
-          else if(line.indexOf(" name=") != -1) //check for type 
+          else if(line.indexOf(" name=") != -1) //check for type
           {
              String type = null;
              if(line.indexOf("type name=") != -1)
@@ -397,15 +422,13 @@ public void processFile(String fileName)throws IOException,
                   {
                       namespace = null;
                   }
-                  index1 = line.indexOf('"');
-                  if(index1 != -1)
-                      index2 = line.indexOf('"', index1+1);
-                  else
+                  index1 = line.indexOf("0.");
+                  index2 = line.indexOf('"', index1+2);
+                  if(index2 == -1)
                   {
-                      index1 = line.indexOf("'"); 
-                      index2 = line.indexOf("'", index1+1);
+                      index2 = line.indexOf("'", index1+2);
                   }
-                  typeName = line.substring(index1+1, index2);
+                  typeName = line.substring(index1+2, index2);
                   level = level + 1;
                   element.add(level, new ElementInfo());
                   for(i=0; i<=level; i++)
@@ -417,9 +440,9 @@ public void processFile(String fileName)throws IOException,
                   ElementInfo e1 = (ElementInfo)element.get(level);
                   String key = null;
                   if(namespace != null)
-                      key = namespace + ":" + type + "=" + typeName;
+                      key = "0." + namespace + ":" + type + "=" + typeName;
                   else
-                      key = type + "=" + typeName;
+                      key = "0." + type + "=" + typeName;
                   e1.setKey(key);
                   element.set(level, e1);
                   index1 = line.indexOf("/>");
@@ -439,7 +462,7 @@ public void processFile(String fileName)throws IOException,
                   }
               }
           }
-          else if((line.indexOf("</type>") != -1) || (line.indexOf("simpleType>") != -1) 
+          else if((line.indexOf("</type>") != -1) || (line.indexOf("simpleType>") != -1)
                  || (line.indexOf("complexType>")!= -1) || (line.indexOf(":type>") != -1))
           {
             for(i=0; i<=level; i++)
@@ -470,6 +493,16 @@ public void processFile(String fileName)throws IOException,
     return;
 }
 
+public String modifyKeyValue(String key, int version)
+{
+  int index = key.indexOf('.');
+  version++;
+  String newVersion = String.valueOf(version);
+  newVersion = newVersion.trim();
+  String newKey = newVersion + "." + key.substring(index+1, key.length());
+  return newKey;
+}
+
 
 /**
 * This method is called by processFile() method. It receives
@@ -481,9 +514,39 @@ public void processFile(String fileName)throws IOException,
 public void addToDB(ElementInfo element)
 {
     String key = element.getKey();
+    int index = key.indexOf("0.");
+    String displayKey = key.substring(index+2, key.length());
     if(db.get(key) != null)
     {
-        System.out.println("Object: " + key + " already exists.");
+        System.out.println("Object: " + displayKey + " already exists. Enter '0' to skip"
+                           +" and '1' to modify this tag.");
+        try
+        {
+            int input=Integer.valueOf(getString().trim()).intValue();
+            if(input < 0 || input > 1)
+                System.out.println("Valid values are 0 or 1. Please try again!");
+            else
+            {
+                if(input == 1)
+                {
+                    Object data = db.get(key);
+                    ElementInfo e1 = ElementInfo.getElementInfo((String)data);
+                    int version = e1.getVersion();
+                    String newKey = modifyKeyValue(key, version);
+                    version++;
+                    element.setVersion(version);
+                    db.remove(key);
+                    e1.setKey(newKey);
+                    db.put(newKey, e1.toString());
+                    addToDB(element);
+                }
+            }
+        }
+        catch(NumberFormatException e)
+        {
+            System.out.println("Not an integer number. Please try again!");
+        }
+
     }
     else
     {
@@ -494,7 +557,7 @@ public void addToDB(ElementInfo element)
                             +"<instancename>, <inner proc. modulename>, <isPersistent>,"
                             +"<instancename>, <post proc. modulename>, <isPersistent>,"
                             +"<instancename>. Press an 'Enter' "
-                            + "key for a default value: <defualt><false>. To skip all tags enter 'skip'");
+                            + "key for a default value: <default><false>. To skip all tags enter 'skip'");
         moduleInfo = askModuleInfo(key);
         if(moduleInfo[0].equals("skip") == false)
             element.setModuleInfo(moduleInfo);
@@ -509,6 +572,7 @@ public void addToDB(ElementInfo element)
       db.put(key, element.toString());
   }
 }
+
 
 
 
@@ -548,12 +612,13 @@ public void addToDB(ElementInfo element)
       {
         System.out.println("Choose from one of the following options:");
         System.out.println("1: Add schema fragments from .xsd file to the database");
-        System.out.println("2: Exit");
+        System.out.println("2: Remove a schema fragment from the database");
+        System.out.println("3: Exit");
         try
         {
             input=Integer.valueOf(getString().trim()).intValue();
-            if(input < 1 || input > 2)
-                System.out.println("Valid values are [1-2]. Please try again!");
+            if(input < 1 || input > 3)
+                System.out.println("Valid values are [1-3]. Please try again!");
             else
             {
                 switch(input)
@@ -569,6 +634,19 @@ public void addToDB(ElementInfo element)
                     }
                     break;
                     case 2:
+                    try
+                    {
+                           schemaInterface1.removeFragment();
+                    }
+                    catch(UnknownTagException ex)                            
+                    {
+                    }
+                    catch(Exception e)
+                    {
+                        System.out.println("The following exception occurred: " + e);
+                    }
+                    break;
+                    case 3:
                     {
                         db.shutdown();
                         System.exit(1);

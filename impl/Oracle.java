@@ -9,7 +9,7 @@
  *              is not avavilable then element name + path will be searched
  *              in database. If database does not have a matching schema
  *              definition then UnknownTagException is thrown.
- * Copyright (c) 2000: The Trustees of Columbia University and the City of New York. 
+ * Copyright (c) 2000: The Trustees of Columbia University and the City of New York.
   *                              All Rights Reserved.
  * @author Kanan Naik
  * @version 1.0
@@ -81,7 +81,7 @@ public synchronized SchemaFragment getFragment(String query)
 	String name = null;
 	String path = null;
 	SchemaFragment fragment = new SchemaFragment();
-	
+
 	try
      {
 	    db = new HashtableDBInterface(dbName);
@@ -106,9 +106,9 @@ public synchronized SchemaFragment getFragment(String query)
 	{
 	    nameSpace = query.substring(index+1, index1);
 		nameSpace = nameSpace.trim();
-		
+
 	}
-	
+
 	if(index3 != -1)
 	{
 	    if(index1 != -1)
@@ -135,7 +135,7 @@ public synchronized SchemaFragment getFragment(String query)
 		    if(index3 == -1)
 			    name = query.substring(index1+1, index2);
 			else
-			    name = query.substring(index3+1, index2);    
+			    name = query.substring(index3+1, index2);
 		}
         path = query.substring(index2+1, query.length());
 		path = path.trim();
@@ -154,12 +154,12 @@ public synchronized SchemaFragment getFragment(String query)
 		    if(index3 == -1)
 			    name = query.substring(index1+1, query.length());
 			else
-			    name = query.substring(index3+1, query.length());    
+			    name = query.substring(index3+1, query.length());
 		}
 	}
 
     name = name.trim();
-		
+
       //Initialize database
 
 	 String nsName = null;
@@ -170,10 +170,10 @@ public synchronized SchemaFragment getFragment(String query)
 	    else
 	        nsName = nameSpace+":"+type+"="+name;
 	 }
-	 
+
 	 Object data = null;
 	 if(nsName != null)
-	    data = db.get(nsName);
+	    data = db.get("0." + nsName);
      if(data == null)
      {
          String namePath = null;
@@ -191,7 +191,7 @@ public synchronized SchemaFragment getFragment(String query)
 	        else
 	            namePath = type+"="+name+","+path;
 	     }
-	     data = db.get(namePath);
+	     data = db.get("0." + namePath);
 	     String modifiedPath = null;
          if(data == null) //modified for partial matching of path(suffix)
          {

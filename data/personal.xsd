@@ -4,7 +4,7 @@
  <element name="personnel">
   <type>
    <element ref="person" minOccurs='1' maxOccurs='*'/>
-   <attribute name="xmlns"/>
+   <attribute name="xmlnsnew"/>
   </type>
  </element>
 
