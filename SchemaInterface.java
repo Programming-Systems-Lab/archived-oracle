@@ -742,7 +742,7 @@ public class SchemaInterface
 					    }
 					catch(Exception e)
 					    {
-						System.err.println("The following exception occurred: " + e);
+						System.err.println("The following exception occurred: " );e.printStackTrace();
 					    }
 					break;
 				    case 2:
@@ -755,7 +755,7 @@ public class SchemaInterface
 					    }
 					catch(Exception e)
 					    {
-						System.err.println("The following exception occurred: " + e);
+						System.err.println("The following exception occurred: "); e.printStackTrace();
 					    }
 					break;
 				    case 3:
