@@ -40,7 +40,8 @@ public class OracleSienaInterface implements Runnable, Notifiable
 	*/
 	public OracleSienaInterface()
 	{
-	    File file = new File("psl//oracle//oracle.prop");
+	    // File file = new File("psl//oracle//oracle.prop");
+	    File file = new File("oracle.prop");
 	    Properties property = new Properties();
 	    try
 	    {
