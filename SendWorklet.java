@@ -29,7 +29,7 @@ public class SendWorklet {
     {
       // this code block creates the Vector of classfile locations to send out
       Worklet wkl = new Worklet(null);
-
+      //System.out.println("module " +moduleName);
       Vector v = new Vector();
       v.add(moduleName);
       System.out.println("Creating CFRWJ");

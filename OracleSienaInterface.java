@@ -25,8 +25,10 @@ public class OracleSienaInterface implements Runnable, Notifiable
     static String hostname = null;
     static String sienaPort = null;
     PrintWriter log = null;
-    static String oraclePath = null;
-    static String propFile = "oracle.prop";
+    static String rootPath = null;
+    static String propFile = null;
+    
+    //static String oraclePath = null;
     // PrintWriter log = new PrintWriter(System.err);
 
     /**
@@ -43,8 +45,19 @@ public class OracleSienaInterface implements Runnable, Notifiable
      */
     public OracleSienaInterface()
     {
-	File file = new File(oraclePath + File.separator + propFile);
+	File file = new File(rootPath + File.separator + "oracle.prop");
+	propFile = rootPath + File.separator + "oracle.prop";
 	// File file = new File("oracle.prop");
+	if(!file.exists())
+            {
+                file = new File(rootPath + File.separator + "psl" +File.separator+ "oracle" + File.separator + "oracle.prop");
+                if(!file.exists())
+                    {
+                        System.out.println ("File 'oracle.prop' does not exist");
+                        System.exit(1);
+                    }
+		    propFile = rootPath + File.separator + "psl" +File.separator+ "oracle" + File.separator + "oracle.prop";
+	    }
 	Properties property = new Properties();
 	try
 	    {
@@ -52,18 +65,18 @@ public class OracleSienaInterface implements Runnable, Notifiable
 	    }
 	catch(FileNotFoundException ffe)
 	    {
-	        printLog("Exception: " + ffe);
+	        System.out.println("Exception: " + ffe);
 	        System.exit(0);
 	    }
 	catch(IOException ioe)
 	    {
-	        printLog("Exception: "+ ioe);
+	        System.out.println("Exception: "+ ioe);
                 System.exit(1);
             }
 	sienaPort = property.getProperty("sienaPort");
 	if(sienaPort == null || sienaPort.length() < 1)
 	    {
-	        printLog("Parameter 'sienaPort' must be set in 'oracle.prop' file.");
+	        System.out.println("Parameter 'sienaPort' must be set in 'oracle.prop' file.");
 	        System.exit(0);
 	    }
 	String master = "senp://localhost:4321";
@@ -96,15 +109,21 @@ public class OracleSienaInterface implements Runnable, Notifiable
     {
 	if((args.length < 1) || (args.length > 2) ) 
 	    {
-		System.out.println("Usage: java psl.oracle.OracleSienaInterface <oracle path> [senp://<host>:<port>]");
+		System.out.println("Usage: java psl.oracle.OracleSienaInterface <root path> [senp://<host>:<port>]");
 		System.exit(1);
 	    }
-	oraclePath = args[0];
-	File file = new File(oraclePath + File.separator + propFile);
+	rootPath = args[0];
+	File file = new File(rootPath + File.separator + "oracle.prop");
+	propFile = rootPath + File.separator + "oracle.prop";
 	if(!file.exists())
 	    {
-		System.out.println("File " + propFile + " does not exist at " + oraclePath);
-		System.exit(2);
+		file = new File(rootPath + File.separator + "psl" + File.separator + "oracle" + File.separator + "oracle.prop");
+		if(!file.exists())
+		    {
+			propFile = rootPath + File.separator + "psl" + File.separator + "oracle" + File.separator + "oracle.prop";
+			System.out.println("File 'oracle.prop' does not exist" + propFile);
+			System.exit(2);
+		    }
 	    }
 	String senp = null;
 	if(args.length == 2)
@@ -184,7 +203,7 @@ public class OracleSienaInterface implements Runnable, Notifiable
 	Hashtable publishEvent = new Hashtable();
 	SchemaFragment fragment = new SchemaFragment();
 	String moduleName = "";
-	Oracle oracle = new Oracle(oraclePath + File.separator + propFile);
+	Oracle oracle = new Oracle(propFile);
 	String msg = null;
 	boolean result = false;
 	publishEvent.put("Hostname", new AttributeValue(hostname));
@@ -194,7 +213,7 @@ public class OracleSienaInterface implements Runnable, Notifiable
 		
 	try
 	    {
-		fragment = oracle.getFragment(query, oraclePath);
+		fragment = oracle.getFragment(query, rootPath);
 	    }
 	catch (UnknownTagException ex)
 	    {
@@ -303,7 +322,7 @@ public class OracleSienaInterface implements Runnable, Notifiable
 	    }
 	else
 	    {
-		printLog("Oracle error: MP query is null.");
+		System.out.println("Oracle error: MP query is null.");
 	    }
     }
 
@@ -314,6 +333,9 @@ public class OracleSienaInterface implements Runnable, Notifiable
     }
 
 }
+
+
+
 
 
 

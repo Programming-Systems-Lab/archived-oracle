@@ -37,15 +37,26 @@ public class SchemaInterface
     String defaultModuleInfo = null;
     String moduleDir = null;
     static DBInterface db = null;
-    String dbName = null;
+    String dbName = "oracleDB";
+    String dbLoc = null;
     PrintWriter log = null;
-    static String oraclePath = null; 
+    static String rootPath = null;
+
 
     public SchemaInterface()
     {
 	//code to read parameters from the property file
-	File file = new File(oraclePath + File.separator + "oracle.prop");
+	File file = new File(rootPath + File.separator + "oracle.prop");
 	// File file = new File("oracle.prop");
+	if(!file.exists())
+	    {
+		file = new File(rootPath + File.separator + "psl" + File.separator + "oracle" + File.separator + "oracle.prop");
+		if(!file.exists())
+		    {
+			System.out.println ("File 'oracle.prop' does not exist");
+			System.exit(1);
+		    }
+	    }
 	Properties property = new Properties();
 	try
 	    {
@@ -64,26 +75,27 @@ public class SchemaInterface
 	moduleInfo = property.getProperty("defaultModuleInfo");
 	if(moduleInfo == null || moduleInfo.length() < 1)
 	    {
-		printLog("Parameter 'defaultModuleInfo' must be set in 'oracle.prop' file.");
+		System.out.println("Parameter 'defaultModuleInfo' must be set in 'oracle.prop' file.");
 		System.exit(0);
 	    }
 	defaultModuleInfo = moduleInfo;
-	dbName = property.getProperty("dbName");
-	if(dbName == null || dbName.length() < 1)
+	dbLoc = property.getProperty("dbLocation");
+	if(dbLoc == null || dbLoc.length() < 1)
 	    {
-		printLog("Parameter 'dbName' must be set in 'oracle.prop' file.");
+		System.out.println("Parameter 'dbLocation' must be set in 'oracle.prop' file.");
 		System.exit(2);
 	    }
 	moduleDir = property.getProperty("moduleDir");
         if(moduleDir == null || moduleDir.length() < 1)
 	    {
-		printLog("Parameter 'moduleDir' must be set in 'oracle.prop' file.");
+		System.out.println("Parameter 'moduleDir' must be set in 'oracle.prop' file.");
 		System.exit(2);
 	    }
 
 	//property file code end here
 	try
 	    {
+		//dbName = dbLoc + File.separator + dbName;
 		db = new DBInterface(dbName);
 	    }
 	catch(Exception e)
@@ -123,7 +135,7 @@ public class SchemaInterface
 	    isPersistent = defaultModuleInfo.substring(index1+1, index2);
     	if(!(isPersistent.equals("true") || isPersistent.equals("false")))
 	    {
-		printLog("Format of 'defaultModuleInfo' in 'oracle.prop' is not proper.");
+		System.out.println("Format of 'defaultModuleInfo' in 'oracle.prop' is not proper.");
 		System.exit(1);
 	    }
     	String instanceName = "null";
@@ -172,21 +184,21 @@ public class SchemaInterface
 			if(st.hasMoreElements())
 			    {
 				moduleName = st.nextToken();
-				fileName = moduleDir + File.separator + moduleName;
+				fileName = rootPath + File.separator + moduleDir + File.separator + moduleName;
 				// png 12 March 2001
 				// tagprocessors are actually either multiple class files or a .jar file
 				// removing check
-				/*
+			       
 				  classFile = new File(fileName);
 				  classExists = classFile.exists();
 				  if(classExists == false)
 				  {
-				  System.out.println("No class exists with the name: " + moduleName
+				  System.out.println("No class exists with the name: " + fileName
 				  +" Please enter again.");
 				  moduleName = defaultModuleInfo.substring(0, index1);
 				  continue;
 				  }
-				*/
+				
 				if(st.hasMoreElements())
 				    {
 					isPersistent = st.nextToken();
@@ -216,7 +228,7 @@ public class SchemaInterface
 							   + "is persistent");
 					continue;
 				    }
-				moduleInfo = moduleDir+File.separator+moduleName+","+isPersistent+","+instanceName;
+				moduleInfo = moduleName+","+isPersistent+","+instanceName;
 				return moduleInfo;
 			    }
 		    }
@@ -713,10 +725,10 @@ public class SchemaInterface
     {
 	if(args.length != 1)
 	    {
-		System.out.println("Usage: java psl.oracle.SchemaInterface <oracle path>");
+		System.out.println("Usage: java psl.oracle.SchemaInterface <root path>");
 		System.exit(1);
 	    }
-	oraclePath = args[0];
+	rootPath = args[0];
 	SchemaInterface schemaInterface1 = new SchemaInterface();
 	int input=0;
 	while(true)

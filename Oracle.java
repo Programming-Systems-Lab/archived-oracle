@@ -25,14 +25,14 @@ public class Oracle implements IOracle
     //Intializes database interface
     Hashtable oracleQuery = new Hashtable();
     static DBInterface db = null;
-    static String dbName = null;
+    static String dbLoc = null;
+    static String dbName = "oracleDB";
     static String moduleDir = null;
     PrintWriter log = null;
 
     public Oracle(String propFile)
     {
 	File file = new File(propFile);
-	// File file = new File("oracle.prop");
 	Properties property = new Properties();
 	try
 	    {
@@ -48,16 +48,16 @@ public class Oracle implements IOracle
 		System.err.println("Exception: "+ ioe);
 		System.exit(1);
 	    }
-	dbName = property.getProperty("dbName");
-	if(dbName == null || dbName.length() < 1)
+	dbLoc = property.getProperty("dbLocation");
+	if(dbLoc == null || dbLoc.length() < 1)
 	    {
-		System.err.println("Parameter 'sienaPort' must be set in 'oracle.prop' file.");
+		System.err.println("Parameter 'dbLocation' must be set in 'oracle.prop' file.");
 		System.exit(0);
 	    }
 	moduleDir = property.getProperty("moduleDir");
 	if(moduleDir == null || moduleDir.length() < 1)
 	    {
-		printLog("Parameter 'moduleDir' must be set in 'oracle.prop' file.");
+		System.out.println("Parameter 'moduleDir' must be set in 'oracle.prop' file.");
 		System.exit(0);
 	    }
     }
@@ -100,7 +100,7 @@ public class Oracle implements IOracle
    * is not valid.
    */
 
-    public synchronized SchemaFragment getFragment(String queryXML, String oraclePath)
+    public synchronized SchemaFragment getFragment(String queryXML, String rootPath)
 	throws UnknownTagException,
 	       InvalidQueryFormatException,
 	       InvalidSchemaFormatException
@@ -112,6 +112,7 @@ public class Oracle implements IOracle
 	String path = null;
 	path = xtq.getPath();
 	SchemaFragment fragment = new SchemaFragment();
+	//dbName = dbLoc + File.separator + dbName;
 	try
 	    {
 		db = new DBInterface(dbName);
@@ -182,7 +183,7 @@ public class Oracle implements IOracle
 
 		// try to get the class for this className
 
-		className = oraclePath + File.separator + className;
+		className = rootPath + File.separator + moduleDir + File.separator + className;
 		classFile = new File(className);
 		classExists = classFile.exists();
 		if(classExists == false)
@@ -255,7 +256,7 @@ public class Oracle implements IOracle
     {
 	if(args.length != 2 )
 	    {
-		System.out.println("USAGE: java Oracle <oracle path> <input file>");
+		System.out.println("USAGE: java Oracle <root path> <input file>");
 		System.exit(1);
 	    }
 	else
@@ -266,8 +267,13 @@ public class Oracle implements IOracle
 			File prop = new File(fileName);
 			if(!prop.exists())
 			    {
-				System.out.println("Property file "+ args[0] + " does not exist..");
-				System.exit(2);
+				prop = new File(args[0] + File.separator + "psl" + File.separator + "oracle" + File.separator + "oracle.prop");
+				if(!prop.exists())
+				    {
+					System.out.println("Property file 'oracle.prop' does not exist..");
+					System.exit(2);
+				    }	
+				fileName = args[0] + File.separator + "psl" + File.separator + "oracle" + File.separator + "oracle.prop";
 			    }
 			String file = args[1];
 			File fileN = new File(file);
@@ -313,6 +319,8 @@ public class Oracle implements IOracle
     }
     
 }
+
+
 
 
 

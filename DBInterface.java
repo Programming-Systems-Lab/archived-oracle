@@ -34,7 +34,7 @@ public class DBInterface
     {
       tableName = userTableName;
       dbname = userTableName+".dat";
-
+      //System.out.println("db "+dbname);
       try
       {
         Class.forName("org.hsql.jdbcDriver");
@@ -92,7 +92,7 @@ public class DBInterface
     }
     catch(SQLException ex)
     {
-        printLog("SQL exception: " + ex);
+        System.out.println("SQL exception: " + ex);
     }
     return result1;
  }
@@ -115,7 +115,7 @@ public class DBInterface
     }
     catch(SQLException ex)
     {
-       printLog("SQL exception: " + ex);
+       System.out.println("SQL exception: " + ex);
     }
  }
 
@@ -133,7 +133,7 @@ public class DBInterface
     }
     catch(SQLException ex)
     {
-        printLog("SQL exception: " + ex);
+        System.out.println("SQL exception: " + ex);
     }
  }
 
