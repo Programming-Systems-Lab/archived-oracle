@@ -9,8 +9,8 @@
  *              is not avavilable then element name + path will be searched
  *              in database. If database does not have a matching schema
  *              definition then UnknownTagException is thrown.
- * Copyright:    Copyright (c) <p>
- * Company:      <p>
+ * Copyright (c) 2000: The Trustees of Columbia University and the City of New York. 
+  *                              All Rights Reserved.
  * @author Kanan Naik
  * @version 1.0
  */
@@ -37,15 +37,15 @@ public class Oracle implements IOracle
 
 
   /** This method gets a schema fragment for a given element.
-   *  All singleton's must have an instance name associated with
-   * them so that the XML MetaParser can store this XML Module,
-   * and so that other XML Modules can get a reference to this
-   * XML Module for communication.
+   * All singletons must have an instance name associated with
+   * them so that the XML MetaParser can store this XML Module
+   * and other XML Modules can get a reference to this XML Module
+   * for communication.
    * @exception UnknownTagException Thrown if there is no schema
    * for the given 'namespace, element name' or 'element name, path'.
-   * @exception InvalidSchemaFormat Thrown if the fragment stored
+   * @exception InvalidSchemaFormatException Thrown if the fragment stored
    * does not have a proper format.
-   * @exception InvalidQueryFormat Thrown if the format of a query
+   * @exception InvalidQueryFormatException Thrown if the format of a query
    * is not proper.
    */
 

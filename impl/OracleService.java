@@ -5,8 +5,8 @@
  *              Service to receive a query and generates an event when it
  *              finds a reply. It pushes and pulls schema Fragment definitions
  *              to WGC.
- * Copyright:    Copyright (c) <p>
- * Company:      <p>
+ * Copyright (c) 2000: The Trustees of Columbia University and the City of New York. 
+  *                              All Rights Reserved.
  * @author Kanan Naik
  * @version 1.0
  */
@@ -97,7 +97,7 @@ public class OracleService implements GroupspaceService,
 
 
   /**
-   * Receives and event from Metaparser and WGC. If an event occures from
+   * Receives an event from Metaparser and WGC. If an event occures from
    * Metaparser, it will call getFragment method and get proper schema definition.
    * It may throw UnknownTag, InvalidQueryFragment and InvalidSchemaFragment
    * exceptions.

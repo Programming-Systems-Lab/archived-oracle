@@ -3,7 +3,8 @@
  * Description: An object which will be stored in database as a string.
  *              It provides "toString" method, which must be used to convert
  *              the different elements of class in a proper format for database.
- * Copyright:    Copyright (c) <p>
+ * Copyright (c) 2000: The Trustees of Columbia University and the City of New York. 
+  *                              All Rights Reserved.
  * Company:      <p>
  * @author Kanan Naik
  * @version 1.0
@@ -17,14 +18,17 @@ import java.util.*;
 
 public class ElementInfo 
 { 
-        public String fragment;
-    	  public String moduleInfo;
+	  public String key = "";
+	  public String path = "";
+        public String fragment = "";
+    	  public String moduleInfo = "";
         
 
   public ElementInfo() 
    {
-       fragment = null;
-       moduleInfo = null;
+	 key = "";
+       fragment = "";
+       moduleInfo = "";
 	 
    }
   
@@ -54,6 +58,24 @@ public class ElementInfo
     return ei;
   }
   
+  public String getKey()
+  {
+	return key;
+  }	
+  public void setKey(String key)
+  {
+	this.key = key;
+  }
+
+  public String getPath()
+  {
+	return path;
+  }	
+  public void setPath(String path)
+  {
+	this.path = path;
+  }
+
   public String getFragment()
   {
     return fragment;

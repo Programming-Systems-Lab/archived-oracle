@@ -9,8 +9,8 @@
  *               the default values. The tags are stored in format of namespace:
  *               element name (if namespace is available and not default) and
  *               element name,path. These will become  keys for database.
- * Copyright:    Copyright (c) <p>
- * Company:      <p>
+ * Copyright (c) 2000: The Trustees of Columbia University and the City of New York. 
+  *                              All Rights Reserved.
  * @author Kanan Naik
  * @version 1.0
  */
@@ -31,6 +31,8 @@ import psl.oracle.exceptions.*;
 
 public class SchemaInterface
 {
+    String moduleInfo = "default,false,default";
+    String defaultModuleInfo = "default,false,default";
     static DBInterface db = null;
     public SchemaInterface()
     {
@@ -47,9 +49,9 @@ public class SchemaInterface
     }
 
 
-/** Prompts user to add an information like module name, if
+/** Prompts user to add information like module name, if
   * singleton or not and instance name. Instance name is only
-  * stored if a module is singleton. A user can press enter tag to
+  * stored if a module is singleton. A user can press "Enter" to
   * store a default value for current tag or he can type 'skip' to
   * store default values for all tags.
   */
@@ -83,7 +85,7 @@ protected String askModuleInfo(String name)
                   }
                 catch (ClassNotFoundException e)
                   {
-                     System.out.println("No class exist with name: " + moduleName
+                     System.out.println("No class exists with the name: " + moduleName
                                         +" Please enter again.");
                      moduleName="default";
       		     continue;
@@ -121,8 +123,8 @@ protected String askModuleInfo(String name)
 }
 
  /** This method is called when a user wants to add schema
-  * fragments to the database. User is promted to enter an
-  * information for every element name. .xsd file entered
+  * fragments to the database. User is promted to enter 
+  * data for every element name. .xsd file entered
   * by a user will be validated using SAX parser.
   */
 
@@ -130,9 +132,9 @@ protected String askModuleInfo(String name)
                                   FileNotFoundException
     {
 	System.out.println("Enter the name of a Schema document(.xsd format)");
-
-      String fileName = getString();
-	BufferedReader inLine = new BufferedReader(new FileReader(fileName));
+	moduleInfo = "default,false,default";
+        String fileName = getString();
+       	BufferedReader inLine = new BufferedReader(new FileReader(fileName));
 	BufferedWriter outLine = new BufferedWriter(new FileWriter("oracletemp.txt"));
       String line  = inLine.readLine();
 	if(line != null)
@@ -144,7 +146,7 @@ protected String askModuleInfo(String name)
 				db.shutdown();
 				System.exit(1);
 		}
-	while(line.indexOf("<schema>") != -1)
+	while((line.indexOf("<schema ") != -1) && (line.indexOf(":schema ") != -1))
 	{	
 		line = inLine.readLine();
 		line = line.trim();
@@ -155,7 +157,7 @@ protected String askModuleInfo(String name)
 		}
 	}
 
-	if(line.indexOf("<schema>") != -1)
+	if((line.indexOf("<schema ") != -1) && (line.indexOf(":schema ") != -1))
 	{	
 		System.out.println("Format of .xsd file is not valid. Tag <schema> "
 					+ "is expected.");
@@ -172,6 +174,7 @@ protected String askModuleInfo(String name)
 			}
 	}
 	outLine.close();
+      inLine.close();
 	
 	FileInputStream is = new FileInputStream("oracletemp.txt");
          //Verify the format of schema file.
@@ -183,88 +186,211 @@ protected String askModuleInfo(String name)
         catch(Exception e)
 	 {
                 System.out.println(e);
-		    db.shutdown();	
-                System.exit(2);
+		    return;
 	 }
-        ElementInfo elementInfo = new ElementInfo();
-        String path = "";
-        String elementName = null;
-	  inLine.close();
-	  inLine = new BufferedReader(new FileReader(fileName));
-        line = inLine.readLine();
-        String fragment = null;
-	  String nameSpace = null;
+	  System.out.println("Schema document validation is successfull.");
+	  is.close();
+        processFile("oracletemp.txt");
+	  return;
+    }
+     
+/**
+* .xsd file is processed by this method. It will generate a proper 
+* key value by computing a path for each element. It also parses
+* a file to store a schema fragment with each element.
+*/
+  
+public void processFile(String fileName)throws IOException,
+							     FileNotFoundException	
+{
+        BufferedReader inLine = new BufferedReader(new FileReader(fileName));
+        String line = inLine.readLine();
+	  String mainPath = "";
+	  int level = -1;
 	  int index = -1;
-        int index1 = -1;
-        int index2 = -1;
-        int i = -1;
-	  
-        String moduleInfo = "default,false,default";
+	  int index1 = -1;
+	  int index2 = -1;
+	  int j = -1;
+	  int i = -1;
+	  Vector element = new Vector(10);
+	  Hashtable paths = new Hashtable();
+	  String elementName = null;
+	  String namespace = null;
+
         while(line != null)
           {
-     		index = line.indexOf(":element ");	
-            index1 =  line.indexOf("element ");
-            if(index1 != -1)
-              {
-                  i=index1+8;
-                  while (line.charAt(i) == ' ')
-                    {
-                      i++;
-                    }
-                  if((line.charAt(i) == 'n') && (line.charAt(i+1) == 'a') &&
-                    (line.charAt(i+2) == 'm') && (line.charAt(i+3) == 'e'))
-                      {
-				if(index != -1)
+		index = line.indexOf("element");	
+		if(index != -1) //element found
+		{
+			j=index+8;
+			if(line.length() > j + 4 )
+			{
+                  	while (line.charAt(j) == ' ')
+                    	{
+                      		j++;
+	                  }
+            	      if((line.charAt(j) == 'n') && (line.charAt(j+1) == 'a') &&   
+	                    (line.charAt(j+2) == 'm') && (line.charAt(j+3) == 'e'))
+                        {
+					level = level + 1;
+					element.add(level, new ElementInfo());
+					index1 = line.indexOf("<");
+					index2 = line.indexOf(":");
+
+					if((index1 != -1) && (index2 != -1) && (index2 < index))
+					{
+						namespace = line.substring(index1+1, index2);
+						namespace = namespace.trim();
+					}
+					else
+					{
+						namespace = null;
+					}
+					index1 = line.indexOf('"');
+                        	index2 = line.indexOf('"', index1+1);
+                        	elementName = line.substring(index1+1, index2);
+					for(i=0; i<=level; i++)
+					{
+						ElementInfo e = (ElementInfo) element.get(i);
+						e.setFragment((e.getFragment()).concat(line));
+                  			element.set(i, e);
+					}
+				
+					ElementInfo e1 = (ElementInfo)element.get(level);
+					mainPath = mainPath.concat("/" + elementName);
+					if(paths.get(elementName) == null)
+					{
+						e1.setPath(mainPath);
+					}
+					else
+					{
+						String temp = (String)paths.get(elementName);		
+						e1.setPath(temp);
+					}
+
+					if(namespace != null)
+					{
+						e1.setKey(namespace + ":" + elementName);
+						element.set(level, e1);
+					}
+					else
+					{
+						e1.setKey(elementName + "," + e1.getPath());
+						element.set(level, e1);
+					}
+
+					index1 = line.indexOf("/>");
+					if(index1 != -1)
+					{
+						ElementInfo e = (ElementInfo) element.get(level);
+						addToDB(e);
+						element.remove(level);
+						int indexPath = mainPath.indexOf("/" + elementName);
+						mainPath = mainPath.substring(0, indexPath);
+						level --;
+					}
+            	    }
+			else if((line.charAt(j) == 'r') && (line.charAt(j+1) == 'e') &&
+                    (line.charAt(j+2) == 'f')) //if element ref found
+			    {
+					index1 = line.indexOf('"');
+					index2 = line.indexOf('"', index1+1);
+					elementName = line.substring(index1+1, index2);
+					int indexPath = mainPath.lastIndexOf('/');
+					String parent =mainPath.substring(indexPath+1, 							   mainPath.length());
+					String path = (String)paths.get(parent);
+					if( path != null)
+						path = path.concat("/" + elementName);	
+					else
+						path = mainPath.concat("/" + elementName);
+					paths.put(elementName, path);
+					for(i=0; i<=level; i++)
+					{
+						ElementInfo e = (ElementInfo) element.get(i);
+						e.setFragment((e.getFragment()).concat(line));
+						element.set(i, e);
+					}
+					
+			    }
+			}
+			else  if((line.indexOf("element>")) != -1)
+			{
+				for(i=0; i<=level; i++)
 				{
-					int tempIndex = line.indexOf('<');
-					nameSpace = line.substring(tempIndex+1, index);
+					ElementInfo e = (ElementInfo) element.get(i);
+					e.setFragment((e.getFragment()).concat(line));
+					element.set(i, e);	
 				}
-                        index1 = line.indexOf('"');
-                        i = line.indexOf('"', index1+1);
-                        elementName = line.substring(index1+1, i);
-                        if(moduleInfo.equals("skip") == false)
-                           {
-                              System.out.println("Enter an information about an element "
-                              + elementName +" in format: <modulename>, <issingleton>, "
-                              +"<instancename>. Press an 'Enter' key for a default "
-                              +"value: <defualt><false>. To skip all tags enter 'skip'");
-                              moduleInfo = askModuleInfo(elementName);
-                           }
-                        path = path.concat("/" + elementName);
-                        fragment = line;
-                        index2 = line.indexOf("</element>");
-                        while(index2 == -1)
-                            {
-                                line = inLine.readLine();
-                                fragment = fragment.concat(line);
-                                index2 = line.indexOf("</element>");
-                            }
-                        
-                        String key = null;
-				if(index != -1)
+				ElementInfo e = (ElementInfo) element.get(level);
+				addToDB(e);
+				element.remove(level);
+				String key = e.getKey();
+				index = key.indexOf(':');
+				if(index == -1)
 				{
-					key = nameSpace + ":" + elementName;
+					index1 = key.indexOf(',');
+					elementName = key.substring(0, index1);
 				}
 				else
 				{
-					key = elementName + "," + path;
+					elementName = key.substring(index+1, key.length());
 				}
-                        elementInfo.setFragment(fragment);
-                        if(moduleInfo.equals("skip") == true)
-                            elementInfo.setModuleInfo("default,false,default");
-                        else
-                            elementInfo.setModuleInfo(moduleInfo);
-				System.out.println("Adding: " + key);
-                        db.put(key, elementInfo.toString());
-               }
-          }
+				int indexPath = mainPath.indexOf("/" + elementName);
+				mainPath = mainPath.substring(0, indexPath);
+				level --;
+			}
+       	}
+		else //element not found
+		{
+			for(i=0; i<=level; i++)
+			{
+				ElementInfo e = (ElementInfo) element.get(i);
+				e.setFragment((e.getFragment()).concat(line));
+				element.set(i, e);	
+			}			
+		}
+		line = inLine.readLine();
+	}
+     return;
+}
 
-          line = inLine.readLine();
-      }
-      is.close();
-      return;
-  }
 
+/**
+* This method is called by processFile() method. It receives
+* an element information in form of key and fragment. It stores
+* an element in the database. At present this method doesn't allow
+* a user to modify or overwrite an existing element.
+*/
+
+public void addToDB(ElementInfo element)
+{
+    String key = element.getKey();
+    if(db.get(key) != null)
+    {
+	 System.out.println("Object: " + key + " already exists.");
+    }
+    else
+    {
+	  if(moduleInfo.equals("skip") == false)
+        {
+              System.out.println("Enter information about an element " + key 
+              + " in format: <modulename>, <issingleton>, <instancename>. Press an 'Enter' "
+              + "key for a default value: <defualt><false>. To skip all tags enter 'skip'");
+                  	      
+		  moduleInfo = askModuleInfo(key);
+		  if(moduleInfo.equals("skip") == false)
+			element.setModuleInfo(moduleInfo);
+		  else
+			element.setModuleInfo(defaultModuleInfo);
+	  }
+	  else
+	  {
+	        element.setModuleInfo(defaultModuleInfo);
+	  }
+        System.out.println("Adding: " + key + "\n\n");
+	  db.put(key, element.toString());
+     }
+}
 
 
  /**
@@ -322,13 +448,11 @@ protected String askModuleInfo(String name)
 					catch(Exception e)
 					    {
 						System.out.println("The following exception occurred: " + e);
-					        db.shutdown();
-						System.exit(1);
 					    }
 					break;
 				    case 2:
 	    			        {
-	    			            db.shutdown();
+	    			          db.shutdown();
 					    System.exit(1);
 				        }
 			            }

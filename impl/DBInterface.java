@@ -2,8 +2,8 @@
 /**
  * Title: DBInterface
  * Description: Creates an interface for Object Store database.
- * Copyright:    Copyright (c) <p>
- * Company:      <p>
+ * Copyright (c) 2000: The Trustees of Columbia University and the City of New York. 
+  *                              All Rights Reserved.
  * @author Kanan Naik
  * @version 1.0
  */

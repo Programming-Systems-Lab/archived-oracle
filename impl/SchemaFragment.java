@@ -6,8 +6,8 @@
  *              definition(tag definition for an element), modulename
  *              associated with this tag, if a module is singleton or
  *              not and instance name if it is singleton.
- * Copyright:    Copyright (c) <p>
- * Company:      <p>
+ * Copyright (c) 2000: The Trustees of Columbia University and the City of New York. 
+  *                              All Rights Reserved.
  * @author Kanan Naik
  * @version 1.0
  */
