@@ -80,7 +80,6 @@ public class SchemaInterface
 		printLog("Parameter 'moduleDir' must be set in 'oracle.prop' file.");
 		System.exit(2);
 	    }
-	moduleDir = oraclePath + File.separator + moduleDir;
 
 	//property file code end here
 	try
@@ -116,7 +115,7 @@ public class SchemaInterface
 		System.err.println("Format of 'defaultModuleInfo' in 'oracle.prop' is not proper: <module path>,<if persistent>,<instance>"        );
 		System.exit(1) ;
 	    }
-    	String moduleName = oraclePath + File.separator + defaultModuleInfo.substring(0, index1);
+    	String moduleName = defaultModuleInfo.substring(0, index1);
     	String isPersistent = null;
     	if(index2 == -1)
 	    isPersistent = defaultModuleInfo.substring(index1+1, defaultModuleInfo.length());

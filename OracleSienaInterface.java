@@ -94,9 +94,9 @@ public class OracleSienaInterface implements Runnable, Notifiable
      */
     public static void main(String[] args)
     {
-	if((args.length < 2) || (args.length > 3)) 
+	if((args.length < 1) || (args.length > 2) ) 
 	    {
-		System.out.println("Usage: java psl.oracle.OracleSienaInterface <oracle path> <port number> [<hostname>]");
+		System.out.println("Usage: java psl.oracle.OracleSienaInterface <oracle path> [senp://<host>:<port>]");
 		System.exit(1);
 	    }
 	oraclePath = args[0];
@@ -106,13 +106,13 @@ public class OracleSienaInterface implements Runnable, Notifiable
 		System.out.println("File " + propFile + " does not exist at " + oraclePath);
 		System.exit(2);
 	    }
-	sienaPort = args[1];
-	/*if(sienaPort == null || sienaPort.length() < 1)
+	String senp = null;
+	if(args.length == 2)
+	    senp = args[1];
+	if(senp == null || senp.length() < 1)
 	    {
-
-	        System.out.println("Usage: java psl.oracle.OracleSienaInterface <port number>");
-	        System.exit(0);
-		}*/
+		senp = "senp://localhost:4321";
+	    }
 	InetAddress addr = null;
 	try
 	    {
@@ -124,11 +124,7 @@ public class OracleSienaInterface implements Runnable, Notifiable
 	    }
 	hostname = addr.getHostName();
 	SendWorklet sw = new SendWorklet(hostname, "OracleRegistry");
-	String master = "senp://localhost:" + sienaPort ;
-	if (args.length > 2)
-	    {
-	       	master = "senp://" + args[2] + ":" + sienaPort;
-	    }
+	String master = senp;
 	final HierarchicalDispatcher hd = new HierarchicalDispatcher();
 	try
 	    {
@@ -187,7 +183,7 @@ public class OracleSienaInterface implements Runnable, Notifiable
     {
 	Hashtable publishEvent = new Hashtable();
 	SchemaFragment fragment = new SchemaFragment();
-	String moduleName = null;
+	String moduleName = "";
 	Oracle oracle = new Oracle(oraclePath + File.separator + propFile);
 	String msg = null;
 	boolean result = false;
@@ -198,7 +194,7 @@ public class OracleSienaInterface implements Runnable, Notifiable
 		
 	try
 	    {
-		fragment = oracle.getFragment(query);
+		fragment = oracle.getFragment(query, oraclePath);
 	    }
 	catch (UnknownTagException ex)
 	    {
@@ -245,7 +241,6 @@ public class OracleSienaInterface implements Runnable, Notifiable
 		SendOracleReply sor = new SendOracleReply();
 		sor.sendReply(MPRequestID, MPHost, MPRequestID, moduleName);
 	    }
-
     }
 
 

@@ -100,7 +100,7 @@ public class Oracle implements IOracle
    * is not valid.
    */
 
-    public synchronized SchemaFragment getFragment(String queryXML)
+    public synchronized SchemaFragment getFragment(String queryXML, String oraclePath)
 	throws UnknownTagException,
 	       InvalidQueryFormatException,
 	       InvalidSchemaFormatException
@@ -182,6 +182,7 @@ public class Oracle implements IOracle
 
 		// try to get the class for this className
 
+		className = oraclePath + File.separator + className;
 		classFile = new File(className);
 		classExists = classFile.exists();
 		if(classExists == false)
@@ -223,6 +224,8 @@ public class Oracle implements IOracle
 
 		    }
 		//className = className.substring(className.lastIndexOf(File.separator)+1, className.length());
+		if(className == null)
+		    className = "";
 		fragment.setModuleName(className);
 		fragment.setIsPersistent(isPersistent);
 		fragment.setInstanceName(instanceName);
@@ -271,7 +274,7 @@ public class Oracle implements IOracle
 			BufferedReader br = new BufferedReader(new FileReader(fileN));
 			String name = br.readLine() ;
 			Oracle oracle = new Oracle(fileName);
-			SchemaFragment fragment = oracle.getFragment(name);
+			SchemaFragment fragment = oracle.getFragment(name, args[0]);
 			SchemaFragmentToXML sfx = new SchemaFragmentToXML();
 			System.out.println(sfx.toXML(fragment));
 		    }
